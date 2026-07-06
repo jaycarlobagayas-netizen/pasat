@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PASAT – G</title>
+<link rel="manifest" href="./manifest.json"/>
+<meta name="theme-color" content="#00FFB2"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="PASAT-G"/>
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.8.0/dist/tabler-icons.min.css"/>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap');
+:root{
+  --bg:#040d12;
+  --bg2:#071520;
+  --bg3:#0c2030;
+  --glass:rgba(0,255,178,0.04);
+  --glass2:rgba(0,255,178,0.08);
+  --border:rgba(0,255,178,0.18);
+  --border2:rgba(0,255,178,0.08);
+  --accent:#00FFB2;
+  --accent2:#00c8ff;
+  --accent3:#EF9F27;
+  --text:#e8f8f0;
+  --text2:#7eb8a0;
+  --text3:#3a7060;
+  --red:#ff4d6d;
+  --purple:#9b6dd1;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+/* grid overlay */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(0,255,178,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,178,0.03) 1px, transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+  z-index:0;
+}
+.page{max-width:780px;margin:0 auto;padding:1.5rem 1rem 3rem;position:relative;z-index:1;}
+
+/* ── HEADER ── */
+.app-header{
+  text-align:center;
+  padding:2rem 0 1.5rem;
+  position:relative;
+}
+.app-header::after{
+  content:'';
+  display:block;
+  width:80%;margin:1.5rem auto 0;
+  height:1px;
+  background:linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+.header-logo{
+  height:64px;
+  width:auto;
+  display:block;
+  margin:0 auto;
+  filter:drop-shadow(0 0 18px rgba(0,255,178,0.35));
+}
+.pilot-badge{
+  display:inline-block;margin-top:10px;
+  font-family:'Orbitron',sans-serif;
+  font-size:9px;font-weight:700;letter-spacing:0.16em;
+  padding:4px 14px;border-radius:20px;
+  border:1px solid var(--accent3);
+  color:var(--accent3);background:rgba(239,159,39,0.08);
+  text-transform:uppercase;
+}
+
+/* ── CARDS ── */
+.card{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:1.5rem;
+  margin-bottom:1rem;
+  backdrop-filter:blur(10px);
+  position:relative;
+  overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  opacity:0.6;
+}
+.card-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:10px;font-weight:700;letter-spacing:0.14em;
+  color:var(--accent);text-transform:uppercase;
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.card-title::before{
+  content:'';display:inline-block;width:3px;height:14px;
+  background:var(--accent);border-radius:2px;
+  box-shadow:0 0 8px var(--accent);
+}
+
+/* ── FIELDS ── */
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:0.04em;text-transform:uppercase;}
+.field input,.field select{
+  height:40px;font-size:14px;padding:0 12px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:var(--bg3);
+  color:var(--text);
+  width:100%;
+  font-family:'Inter',sans-serif;
+  transition:all 0.2s;
+}
+.field input:focus,.field select:focus{
+  outline:none;border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(0,255,178,0.1);
+  background:rgba(0,255,178,0.06);
+}
+.field select option{background:#071520;}
+
+/* ── HAND TOGGLE ── */
+.hand-toggle{display:flex;gap:8px;}
+.hand-btn{
+  flex:1;height:40px;
+  border:1px solid var(--border);border-radius:8px;
+  font-size:12px;font-weight:600;letter-spacing:0.05em;
+  cursor:pointer;
+  background:var(--bg3);color:var(--text2);
+  transition:all 0.2s;font-family:'Inter',sans-serif;
+}
+.hand-btn:hover{border-color:var(--accent);color:var(--accent);}
+.hand-btn.active{
+  background:rgba(0,255,178,0.12);
+  border-color:var(--accent);color:var(--accent);
+  box-shadow:0 0 12px rgba(0,255,178,0.2);
+}
+
+/* ── TRIAL ROWS ── */
+.set-block{margin-bottom:1.5rem;}
+.set-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.set-hdr h3{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;color:var(--accent2);letter-spacing:0.08em;}
+.set-tot{font-size:12px;color:var(--text3);}
+.set-tot span{font-weight:700;color:var(--text);}
+.trial-row{display:grid;grid-template-columns:28px 58px 1fr 44px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border2);}
+.trial-row:last-child{border-bottom:none;}
+.t-num{font-size:11px;color:var(--text3);text-align:center;font-family:'Orbitron',sans-serif;}
+.stroke-tag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;text-align:center;letter-spacing:0.06em;}
+.fh-tag{background:rgba(0,200,255,0.15);color:var(--accent2);border:1px solid rgba(0,200,255,0.3);}
+.bh-tag{background:rgba(155,109,209,0.15);color:var(--purple);border:1px solid rgba(155,109,209,0.3);}
+.zone-btns{display:flex;gap:3px;flex-wrap:wrap;}
+.zone-btn{
+  font-size:10px;padding:3px 8px;border-radius:6px;
+  border:1px solid var(--border);background:var(--bg3);
+  color:var(--text2);cursor:pointer;white-space:nowrap;
+  font-weight:600;transition:all 0.15s;font-family:'Inter',sans-serif;
+}
+.zone-btn:hover{border-color:var(--accent);color:var(--accent);}
+.zone-btn.sel-4{background:rgba(0,255,178,0.15);border-color:var(--accent);color:var(--accent);box-shadow:0 0 8px rgba(0,255,178,0.2);}
+.zone-btn.sel-3{background:rgba(155,109,209,0.15);border-color:var(--purple);color:var(--purple);}
+.zone-btn.sel-2{background:rgba(0,200,255,0.15);border-color:var(--accent2);color:var(--accent2);}
+.zone-btn.sel-1{background:rgba(80,200,80,0.15);border-color:#50c850;color:#50c850;}
+.zone-btn.sel-0{background:rgba(255,77,109,0.15);border-color:var(--red);color:var(--red);}
+.sc-disp{font-size:15px;font-weight:700;text-align:right;color:var(--text);font-family:'Orbitron',sans-serif;}
+.sc-disp.empty{color:var(--text3);font-weight:400;font-family:'Inter',sans-serif;}
+.set-divider{display:flex;align-items:center;gap:8px;margin:4px 0 8px;}
+.div-line{flex:1;height:1px;background:var(--border2);}
+.div-lbl{font-size:10px;color:var(--text3);letter-spacing:0.06em;text-transform:uppercase;}
+
+/* ── SUMMARY ── */
+.sum-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem;}
+.stat-box{
+  background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 8px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.stat-box::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0.4;
+}
+.stat-val{font-size:22px;font-weight:700;color:var(--accent);font-family:'Orbitron',sans-serif;}
+.stat-sub{font-size:10px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:0.06em;}
+.interp-box{border-radius:10px;padding:10px 14px;margin-bottom:8px;border:1px solid;}
+.interp-box.excellent{background:rgba(0,255,178,0.08);border-color:rgba(0,255,178,0.3);}
+.interp-box.verygood{background:rgba(80,200,80,0.08);border-color:rgba(80,200,80,0.3);}
+.interp-box.average{background:rgba(239,159,39,0.08);border-color:rgba(239,159,39,0.3);}
+.interp-box.below{background:rgba(255,150,50,0.08);border-color:rgba(255,150,50,0.3);}
+.interp-box.poor{background:rgba(255,77,109,0.08);border-color:rgba(255,77,109,0.3);}
+.i-lbl{font-size:12px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:0.06em;}
+.i-lbl.excellent{color:var(--accent);}
+.i-lbl.verygood{color:#50c850;}
+.i-lbl.average{color:var(--accent3);}
+.i-lbl.below{color:#ff9632;}
+.i-lbl.poor{color:var(--red);}
+.i-desc{font-size:11px;margin-top:3px;color:var(--text2);}
+.interp-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+
+/* ── HEATMAP ── */
+.heatmap-section{margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border2);}
+.filter-btns{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+.filter-btn{
+  font-size:11px;padding:5px 14px;border-radius:20px;
+  border:1px solid var(--border);
+  background:var(--bg3);color:var(--text2);
+  cursor:pointer;font-weight:600;letter-spacing:0.05em;
+  transition:all 0.2s;font-family:'Inter',sans-serif;
+}
+.filter-btn.active{
+  background:rgba(0,255,178,0.12);
+  border-color:var(--accent);color:var(--accent);
+  box-shadow:0 0 10px rgba(0,255,178,0.15);
+}
+.heatmap-wrap{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;}
+.heatmap-legend{flex:1;min-width:150px;}
+.leg-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;}
+.swatch{width:14px;height:14px;border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+/* ── ACTION BUTTONS ── */
+.action-row{display:flex;gap:10px;margin-top:1.25rem;}
+.btn-save{
+  flex:1;height:44px;
+  background:linear-gradient(135deg,#00FFB2,#00c8a0);
+  color:#040d12;border:none;border-radius:10px;
+  font-size:13px;font-weight:700;cursor:pointer;
+  font-family:'Orbitron',sans-serif;letter-spacing:0.08em;
+  transition:all 0.2s;
+  box-shadow:0 0 20px rgba(0,255,178,0.3);
+}
+.btn-save:hover{box-shadow:0 0 30px rgba(0,255,178,0.5);transform:translateY(-1px);}
+.btn-clear{
+  height:44px;padding:0 18px;
+  background:transparent;border:1px solid var(--border);border-radius:10px;
+  font-size:12px;cursor:pointer;color:var(--text2);
+  font-family:'Inter',sans-serif;transition:all 0.2s;
+}
+.btn-clear:hover{border-color:var(--red);color:var(--red);}
+.section-sep{border:none;border-top:1px solid var(--border2);margin:1.25rem 0;}
+
+/* ── RESULTS TABLE ── */
+.res-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.res-hdr h2{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--accent);letter-spacing:0.1em;}
+.btn-exp{
+  font-size:11px;padding:6px 14px;
+  background:transparent;border:1px solid var(--border);border-radius:8px;
+  cursor:pointer;color:var(--text2);font-weight:600;
+  transition:all 0.2s;font-family:'Inter',sans-serif;
+}
+.btn-exp:hover{border-color:var(--accent);color:var(--accent);}
+.res-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{text-align:left;font-size:9px;font-weight:700;color:var(--text3);padding:7px 8px;border-bottom:1px solid var(--border);white-space:nowrap;text-transform:uppercase;letter-spacing:0.08em;font-family:'Orbitron',sans-serif;}
+td{padding:9px 8px;border-bottom:1px solid var(--border2);color:var(--text);white-space:nowrap;}
+tr:hover td{background:var(--glass2);}
+tr:last-child td{border-bottom:none;}
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:0.05em;}
+.pill-e{background:rgba(0,255,178,0.15);color:var(--accent);border:1px solid rgba(0,255,178,0.4);}
+.pill-vg{background:rgba(80,200,80,0.15);color:#50c850;border:1px solid rgba(80,200,80,0.4);}
+.pill-a{background:rgba(239,159,39,0.15);color:var(--accent3);border:1px solid rgba(239,159,39,0.4);}
+.pill-b{background:rgba(255,150,50,0.15);color:#ff9632;border:1px solid rgba(255,150,50,0.4);}
+.pill-p{background:rgba(255,77,109,0.15);color:var(--red);border:1px solid rgba(255,77,109,0.4);}
+@media(max-width:520px){
+  .field-grid{grid-template-columns:1fr;}
+  .sum-grid{grid-template-columns:1fr 1fr;}
+  .interp-row{grid-template-columns:1fr;}
+  .trial-row{grid-template-columns:24px 50px 1fr 38px;gap:5px;}
+  .heatmap-wrap{flex-direction:column;}
+}
+
+/* ── AUTH OVERLAY ── */
+.auth-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:rgba(4,13,18,0.96);backdrop-filter:blur(8px);padding:1rem;}
+.auth-card{width:100%;max-width:380px;background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:2rem 1.5rem;text-align:center;position:relative;overflow:hidden;}
+.auth-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
+.auth-logo{height:84px;margin:0 auto 1rem;display:block;filter:drop-shadow(0 0 18px rgba(0,255,178,0.4));}
+.auth-title{font-family:'Orbitron',sans-serif;font-size:15px;font-weight:700;color:var(--accent);letter-spacing:0.1em;margin-bottom:4px;}
+.auth-sub{font-size:11px;color:var(--text3);margin-bottom:1.5rem;text-transform:uppercase;letter-spacing:0.08em;}
+.auth-field{text-align:left;margin-bottom:12px;}
+.auth-field label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:5px;}
+.auth-field input{width:100%;height:42px;font-size:14px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-family:'Inter',sans-serif;}
+.auth-field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,255,178,0.1);}
+.auth-btn{width:100%;height:44px;margin-top:6px;background:linear-gradient(135deg,#00FFB2,#00c8a0);color:#040d12;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Orbitron',sans-serif;letter-spacing:0.06em;box-shadow:0 0 20px rgba(0,255,178,0.25);transition:all 0.2s;}
+.auth-btn:hover{box-shadow:0 0 30px rgba(0,255,178,0.45);}
+.auth-toggle{margin-top:14px;font-size:12px;color:var(--text2);}
+.auth-toggle a{color:var(--accent);cursor:pointer;font-weight:600;text-decoration:none;}
+.auth-err{margin-top:12px;font-size:12px;color:var(--red);min-height:16px;}
+.auth-mode-note{margin-top:16px;padding-top:14px;border-top:1px solid var(--border2);font-size:10px;color:var(--text3);line-height:1.5;}
+/* mode banner */
+.mode-banner{font-size:11px;text-align:center;padding:8px 12px;border-radius:8px;margin-bottom:1rem;letter-spacing:0.02em;}
+.mode-banner.local{background:rgba(239,159,39,0.1);border:1px solid rgba(239,159,39,0.3);color:var(--accent3);}
+.mode-banner.cloud{background:rgba(0,255,178,0.08);border:1px solid rgba(0,255,178,0.25);color:var(--accent);}
+/* user bar */
+.user-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;font-size:12px;color:var(--text2);}
+.user-bar .uchip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);}
+.user-bar button{background:transparent;border:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:'Inter',sans-serif;}
+.user-bar button:hover{border-color:var(--red);color:var(--red);}
+/* clickable rows */
+tr.clickable{cursor:pointer;transition:background 0.15s;}
+tr.clickable:hover td{background:var(--glass2);}
+.code-link{color:var(--accent)!important;text-decoration:underline;text-decoration-color:rgba(0,255,178,0.4);text-underline-offset:2px;}
+/* detail modal */
+.modal-overlay{position:fixed;inset:0;z-index:900;display:none;align-items:flex-start;justify-content:center;background:rgba(4,13,18,0.9);backdrop-filter:blur(6px);padding:2rem 1rem;overflow-y:auto;}
+.modal-overlay.open{display:flex;}
+.modal-card{width:100%;max-width:620px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.5rem;position:relative;}
+.modal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
+.modal-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;font-size:16px;}
+.modal-close:hover{border-color:var(--red);color:var(--red);}
+.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:1rem 0;}
+.detail-stat{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;}
+.detail-stat .v{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:700;color:var(--accent);}
+.detail-stat .l{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-top:3px;}
+.trial-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:8px;}
+.tcell{aspect-ratio:1;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:'Orbitron',sans-serif;color:#040d12;}
+.pct-pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;}
+
+.stat-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px;}
+.stat-tbl th{text-align:left;font-size:9px;font-weight:700;color:var(--text3);padding:6px 8px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:0.06em;font-family:'Orbitron',sans-serif;}
+.stat-tbl td{padding:7px 8px;border-bottom:1px solid var(--border2);color:var(--text);}
+.stat-tbl tr:last-child td{border-bottom:none;}
+.stat-tbl td:first-child{color:var(--text2);}
+
+.pro-badge{display:none;font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.14em;padding:3px 10px;border-radius:20px;background:linear-gradient(135deg,#00FFB2,#00c8ff);color:#040d12;margin-left:8px;vertical-align:middle;}
+.lic-panel{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1rem;}
+.lic-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.lic-row input{flex:1;min-width:180px;height:40px;font-size:14px;letter-spacing:0.08em;text-transform:uppercase;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-family:monospace;}
+.lic-row input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,255,178,0.1);}
+.lic-btn{height:40px;padding:0 18px;background:linear-gradient(135deg,#00FFB2,#00c8a0);color:#040d12;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Orbitron',sans-serif;letter-spacing:0.05em;}
+.lock-overlay{background:rgba(0,200,255,0.05);border:1px dashed rgba(0,200,255,0.4);border-radius:12px;padding:1.5rem;text-align:center;}
+.lock-overlay .ti{font-size:28px;color:var(--accent2);}
+</style>
+</head>
+<body>
+
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-card">
+    <img class="auth-logo" id="auth-logo" alt="PASAT-G"/>
+    <div class="auth-title">PASAT &ndash; G</div>
+    <div class="auth-sub" id="auth-sub">Sign in to continue</div>
+    <div class="auth-field"><label>Email</label><input type="email" id="auth-email" placeholder="you@example.com" autocomplete="username"/></div>
+    <div class="auth-field"><label>Password</label><input type="password" id="auth-pass" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="current-password"/></div>
+    <button class="auth-btn" id="auth-action" onclick="authSubmit()">SIGN IN</button>
+    <div class="auth-toggle" id="auth-toggle">No account yet? <a onclick="toggleAuthMode()">Create one</a></div>
+    <div class="auth-toggle" id="auth-forgot" style="display:none">Forgot your password? <a onclick="resetPassword()">Reset it by email</a></div>
+    <div class="auth-err" id="auth-err"></div>
+    <div class="auth-mode-note" id="auth-mode-note"></div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detail-modal" onclick="if(event.target===this)closeDetail()">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeDetail()">&times;</button>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<div class="page">
+
+  <header class="app-header">
+    <img class="header-logo" src="./assets/logo.png" alt="PASAT-G logo" alt="PASAT-G"/>
+    <div><span class="pilot-badge">&#x25A0; Pilot Testing Phase</span><span class="pro-badge" id="pro-badge">&#9733; PRO</span></div>
+    <div class="user-bar" id="user-bar" style="display:none;">
+      <span class="uchip"><i class="ti ti-user"></i><span id="user-email">—</span></span>
+      <button onclick="doLogout()"><i class="ti ti-logout" style="margin-right:4px"></i>Sign out</button>
+    </div>
+    <div id="mode-banner-holder"></div>
+  </header>
+
+  <div class="lic-panel">
+    <div class="card-title" style="margin-bottom:6px;">&#9733; Pro Unlock</div>
+    <div id="lic-panel-state" style="font-size:12px;color:var(--text2);"></div>
+    <div class="lic-row" id="lic-entry">
+      <input id="lic-input" placeholder="PASATG-XXXX-XXXX-XXXX" maxlength="22"/>
+      <button class="lic-btn" onclick="activatePro()">UNLOCK</button>
+    </div>
+    <div id="lic-msg" style="font-size:11px;margin-top:8px;min-height:14px;"></div>
+    <div style="font-size:10px;color:var(--text3);margin-top:6px;line-height:1.5;">Pro unlocks centralized Cloud Sync and the Research Analytics dashboard. The free version includes full score entry, arm map, court heatmap, local results, and CSV export.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Participant Info</div>
+    <div class="field-grid">
+      <div class="field" style="grid-column:1/-1"><label>Participant Code</label><input type="text" id="p-code" placeholder="e.g. PASAT-G 001"/></div>
+    </div>
+    <div class="field-grid">
+      <div class="field"><label>Sex</label><select id="p-sex"><option value="">— Select —</option><option>M</option><option>F</option></select></div>
+      <div class="field"><label>Age</label><input type="number" id="p-age" placeholder="e.g. 27" min="5" max="99"/></div>
+    </div>
+    <div class="field-grid">
+      <div class="field"><label>Playing Experience (yrs)</label><input type="number" id="p-exp" placeholder="e.g. 3" min="0"/></div>
+      <div class="field"><label>Dominant Hand</label><div class="hand-toggle"><button class="hand-btn" id="hand-r" onclick="setHand('R')">Right</button><button class="hand-btn" id="hand-l" onclick="setHand('L')">Left</button></div></div>
+    </div>
+    <div class="field-grid">
+      <div class="field"><label>Date of Test</label><input type="date" id="p-date"/></div>
+      <div class="field"><label>Tester / Rater</label><input type="text" id="p-tester" placeholder="Name"/></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Score Entry &nbsp;·&nbsp; 3 Sets &times; 10 Trials</div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:14px;letter-spacing:0.02em;">Tap a zone for each trial &nbsp;·&nbsp; FH = Forehand &nbsp; BH = Backhand &nbsp;|&nbsp; DCZ=4 &nbsp; DMZ=3 &nbsp; CMZ=2 &nbsp; KAZ=1 &nbsp; Out/Net=0</p>
+    <div id="trials-container"></div>
+
+    <hr class="section-sep"/>
+
+    <div class="card-title" style="margin-bottom:10px;">Live Summary</div>
+    <div class="sum-grid">
+      <div class="stat-box"><div class="stat-val" id="sum-fh">—</div><div class="stat-sub">FH Mean</div></div>
+      <div class="stat-box"><div class="stat-val" id="sum-bh">—</div><div class="stat-sub">BH Mean</div></div>
+      <div class="stat-box"><div class="stat-val" id="sum-final">—</div><div class="stat-sub">PASAT-G</div></div>
+      <div class="stat-box"><div class="stat-val" id="sum-pct">—</div><div class="stat-sub">Accuracy</div></div>
+    </div>
+    <div id="interp-overall"></div>
+    <div class="interp-row"><div id="interp-fh"></div><div id="interp-bh"></div></div>
+
+    <div class="heatmap-section">
+      <div class="card-title" style="margin-bottom:10px;">Biomechanic Arm Map</div>
+      <p style="font-size:11px;color:var(--text3);margin-bottom:12px;letter-spacing:0.02em;">Each arm fills by stroke accuracy level &nbsp;·&nbsp; <span style="color:var(--accent2)">Right = Forehand</span> &nbsp; <span style="color:var(--purple)">Left = Backhand</span></p>
+      <div class="heatmap-wrap">
+        <div><svg id="body-svg" viewBox="0 0 320 460" width="230" style="display:block;" aria-label="Biomechanic body map of forehand and backhand accuracy"></svg></div>
+        <div class="heatmap-legend" id="body-legend"></div>
+      </div>
+    </div>
+
+    <div class="heatmap-section">
+      <div class="card-title" style="margin-bottom:10px;">Live Court Heatmap</div>
+      <div class="filter-btns">
+        <button class="filter-btn active" id="fb-all" onclick="setFilter('all')">All Shots</button>
+        <button class="filter-btn" id="fb-fh" onclick="setFilter('fh')">Forehand</button>
+        <button class="filter-btn" id="fb-bh" onclick="setFilter('bh')">Backhand</button>
+      </div>
+      <div class="heatmap-wrap">
+        <div><svg id="court-svg" viewBox="0 0 300 470" width="230" style="display:block;" aria-label="PASAT-G court zone heatmap"></svg></div>
+        <div class="heatmap-legend" id="heatmap-legend"></div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-save" onclick="saveEntry()"><i class="ti ti-device-floppy" style="margin-right:6px"></i>SAVE PARTICIPANT</button>
+      <button class="btn-clear" onclick="resetForm()"><i class="ti ti-refresh"></i></button>
+    </div>
+  </div>
+
+  <div class="card" id="results-card" style="display:none;">
+    <div class="res-hdr">
+      <h2><i class="ti ti-table" style="margin-right:6px"></i>Results</h2>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-exp" onclick="exportCSV()"><i class="ti ti-download" style="margin-right:4px"></i>Export CSV</button>
+        <button class="btn-exp" id="btn-reset-all" style="display:none;border-color:rgba(255,77,109,0.5);color:var(--red);" onclick="resetAllData()"><i class="ti ti-trash" style="margin-right:4px"></i>Clear All</button>
+      </div>
+    </div>
+    <div class="res-wrap"><div id="results-body"></div></div>
+  </div>
+
+  <div class="card" id="analytics-card" style="display:none;">
+    <div class="res-hdr">
+      <h2><i class="ti ti-chart-histogram" style="margin-right:6px"></i>Research Analytics</h2>
+      <button class="btn-exp" onclick="exportStats()"><i class="ti ti-download" style="margin-right:4px"></i>Export Stats CSV</button>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:14px;letter-spacing:0.02em;">Aggregate analysis of all saved samples (n shown below). Recomputes live as records are added. For research / instrument-validation purposes.</p>
+    <div class="lock-overlay" id="analytics-lock" style="display:none;">
+      <div><i class="ti ti-lock"></i></div>
+      <div style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--accent2);margin:8px 0 4px;letter-spacing:0.06em;">PRO FEATURE</div>
+      <div style="font-size:12px;color:var(--text2);">Unlock Pro to access the full research analytics dashboard (normality, validity, Hoyt reliability, and norms).</div>
+    </div>
+    <div id="analytics-body"></div>
+  </div>
+
+  <footer style="text-align:center;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border2);">
+    <div style="font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">Developed by</div>
+    <div style="font-size:14px;font-weight:600;color:var(--accent);">Asst. Prof. Jay Carlo S. Bagayas</div>
+    <div style="font-size:12px;color:var(--text2);margin-top:3px;">Bachelor of Physical Education</div>
+    <div style="font-size:12px;color:var(--text2);">MSU – General Santos, Philippines</div>
+    <div style="font-size:10px;color:var(--text3);margin-top:10px;">PASAT-G · Pickleball Accuracy Skill Assessment Test – Groundstrokes</div>
+  </footer>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="./config.js"></script>
+<script>
+const ZONES=[{label:'DCZ',score:4},{label:'DMZ',score:3},{label:'CMZ',score:2},{label:'KAZ',score:1},{label:'OUT/NET',score:0}];
+const TOTAL=30;
+let scores=Array(TOTAL).fill(null),hand=null,entries=[],currentFilter='all';
+
+
+
+/* ============================================================
+   PRO LICENSE (offline-verified unlock codes)
+   - Change LICENSE_SALT to your own secret phrase, then use the
+     same salt in the key-generator tool to create codes you sell.
+   - A code looks like:  PASATG-XXXX-XXXX-XXXX
+   - Pro unlocks: Cloud Sync + Research Analytics.
+   ============================================================ */
+const PRO_FEATURES = "Cloud Sync + Research Analytics";
+let isPro = false;
+
+function _hash32(str){ let h=2166136261>>>0; for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)>>>0;} return h>>>0; }
+function _b32(n){ const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s=""; n=n>>>0; for(let i=0;i<4;i++){s=A[n&31]+s;n=n>>>5;} return s; }
+// Build the expected 4th block from the first three blocks + salt
+function _expectedBlock(p1,p2,p3){
+  const base=(p1+"-"+p2+"-"+p3+"|"+LICENSE_SALT);
+  return _b32(_hash32(base)) ;
+}
+function validateLicense(code){
+  if(!code) return false;
+  const c=code.trim().toUpperCase().replace(/\s/g,"");
+  const m=c.match(/^PASATG-([A-Z0-9]{4})-([A-Z0-9]{4})-([A-Z0-9]{4})$/);
+  if(!m) return false;
+  // the first two blocks are payload, the THIRD block is the check of payload+salt
+  const exp=_expectedBlock("PASATG",m[1],m[2]);
+  return exp===m[3];
+}
+function loadProState(){
+  try{ const k=localStorage.getItem('pasatg_license'); if(k && validateLicense(k)){ isPro=true; } }catch(e){}
+}
+function activatePro(){
+  const inp=document.getElementById('lic-input');
+  const code=inp?inp.value:'';
+  const msg=document.getElementById('lic-msg');
+  if(validateLicense(code)){
+    try{ localStorage.setItem('pasatg_license', code.trim().toUpperCase()); }catch(e){}
+    isPro=true;
+    if(msg){msg.style.color='var(--accent)';msg.textContent='\u2713 Pro activated. Thank you!';}
+    applyProState();
+  } else {
+    if(msg){msg.style.color='var(--red)';msg.textContent='Invalid code. Please check and try again.';}
+  }
+}
+function deactivatePro(){
+  if(!confirm('Remove Pro from this device?')) return;
+  try{ localStorage.removeItem('pasatg_license'); }catch(e){}
+  isPro=false; applyProState();
+}
+function applyProState(){
+  // badge
+  const badge=document.getElementById('pro-badge');
+  if(badge) badge.style.display=isPro?'inline-block':'none';
+  // Pro panel button label
+  const lp=document.getElementById('lic-panel-state');
+  if(lp) lp.innerHTML = isPro
+    ? 'Status: <span style="color:var(--accent);font-weight:700;">PRO ACTIVE</span> &mdash; '+PRO_FEATURES+' &nbsp; <a onclick="deactivatePro()" style="color:var(--text3);cursor:pointer;text-decoration:underline;">remove</a>'
+    : 'Status: <span style="color:var(--accent3);font-weight:700;">FREE</span> &mdash; enter a code to unlock '+PRO_FEATURES+'.';
+  // gate analytics
+  const ac=document.getElementById('analytics-card');
+  const lock=document.getElementById('analytics-lock');
+  if(ac&&lock){
+    if(isPro){ lock.style.display='none'; renderAnalytics(); }
+    else { lock.style.display='block'; document.getElementById('analytics-body').innerHTML=''; ac.style.display=(entries&&entries.length>=2)?'block':'none'; }
+  }
+  // cloud sync gating handled at subscribe time
+  const cs=document.getElementById('cloud-status-note');
+  if(cs) cs.style.display=(USE_FB&&!isPro)?'block':'none';
+}
+
+
+const USE_FB = FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey.indexOf("PASTE")===-1;
+let auth=null, db=null, currentUser=null, unsub=null, authIsSignup=false;
+const AUTH_LOGO="./assets/logo.png";
+
+function initBackend(){
+  document.getElementById('auth-logo').src=AUTH_LOGO;
+  if(USE_FB){
+    try{ firebase.initializeApp(FIREBASE_CONFIG); auth=firebase.auth(); db=firebase.firestore();
+      db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+      auth.onAuthStateChanged(u=>{ currentUser=u; if(u){ enterApp(u.email); if(isPro){ subscribeCloud(); } else { loadLocal(); } } else { showLogin(); } });
+    }catch(e){ console.warn(e); fallbackLocal(); }
+    document.getElementById('auth-forgot').style.display='block';
+    document.getElementById('auth-mode-note').innerHTML='&#x2601;&#xFE0F; Cloud mode &mdash; data is centralized and shared across all accounts.';
+  } else {
+    fallbackLocal();
+  }
+}
+function fallbackLocal(){
+  document.getElementById('auth-mode-note').innerHTML='&#x1F4F1; Local mode &mdash; data is saved on this device. Add your Firebase config in the file to enable centralized cloud storage + real logins.';
+  const lu=localStorage.getItem('pasatg_user');
+  if(lu){ currentUser={email:lu}; enterApp(lu); loadLocal(); } else { showLogin(); }
+}
+
+function showLogin(){ document.getElementById('auth-overlay').style.display='flex'; document.getElementById('user-bar').style.display='none'; }
+function enterApp(email){
+  document.getElementById('auth-overlay').style.display='none';
+  document.getElementById('user-bar').style.display='flex';
+  document.getElementById('user-email').textContent=email||'Guest';
+  const isAdmin = email && ADMIN_EMAIL && email.toLowerCase()===ADMIN_EMAIL.toLowerCase();
+  const rb=document.getElementById('btn-reset-all'); if(rb) rb.style.display=isAdmin?'inline-flex':'none';
+  applyProState();
+  const holder=document.getElementById('mode-banner-holder');
+  holder.innerHTML = USE_FB
+    ? '<div class="mode-banner cloud">&#x2601;&#xFE0F; Connected to centralized cloud storage</div>'
+    : '<div class="mode-banner local">&#x1F4F1; Local mode &mdash; data saved on this device only</div>';
+}
+
+function toggleAuthMode(){
+  authIsSignup=!authIsSignup;
+  document.getElementById('auth-sub').textContent=authIsSignup?'Create your account':'Sign in to continue';
+  document.getElementById('auth-action').textContent=authIsSignup?'CREATE ACCOUNT':'SIGN IN';
+  document.getElementById('auth-toggle').innerHTML=authIsSignup?'Already have an account? <a onclick="toggleAuthMode()">Sign in</a>':'No account yet? <a onclick="toggleAuthMode()">Create one</a>';
+  document.getElementById('auth-err').textContent='';
+}
+function authSubmit(){
+  const email=document.getElementById('auth-email').value.trim();
+  const pass=document.getElementById('auth-pass').value;
+  const err=document.getElementById('auth-err');
+  err.textContent='';
+  if(!email){err.textContent='Please enter an email.';return;}
+  if(USE_FB){
+    if(!pass||pass.length<6){err.textContent='Password must be at least 6 characters.';return;}
+    const op=authIsSignup?auth.createUserWithEmailAndPassword(email,pass):auth.signInWithEmailAndPassword(email,pass);
+    op.catch(e=>{err.textContent=(e&&e.message)?e.message.replace('Firebase: ','') : 'Authentication failed.';});
+  } else {
+    localStorage.setItem('pasatg_user',email); currentUser={email}; enterApp(email); loadLocal();
+  }
+}
+function resetPassword(){
+  const email=document.getElementById('auth-email').value.trim();
+  const err=document.getElementById('auth-err');
+  if(!email){err.textContent='Type your email above first, then tap the reset link.';return;}
+  auth.sendPasswordResetEmail(email)
+    .then(()=>{err.style.color='var(--accent)';err.textContent='\u2713 Reset email sent \u2014 check your inbox (and spam folder).';})
+    .catch(e=>{err.style.color='var(--red)';err.textContent=(e&&e.message)?e.message.replace('Firebase: ',''):'Could not send reset email.';});
+}
+function doLogout(){
+  if(USE_FB){ if(unsub){unsub();unsub=null;} auth.signOut(); }
+  else { localStorage.removeItem('pasatg_user'); currentUser=null; entries=[]; renderResults(); showLogin(); }
+}
+
+/* ---- Storage layer ---- */
+function subscribeCloud(){
+  if(unsub)unsub();
+  unsub=db.collection('participants').orderBy('finalScore','desc').onSnapshot(
+    snap=>{ entries=snap.docs.map(d=>Object.assign({id:d.id}, d.data())); renderResults(); },
+    e=>{console.warn('sync error',e);
+      if(e&&e.code==='permission-denied'){
+        const holder=document.getElementById('mode-banner-holder');
+        if(holder) holder.innerHTML='<div class="mode-banner local">\u26A0\uFE0F Cloud access denied \u2014 check the Firestore security rules (see deployment guide). Data entry still works locally.</div>';
+        loadLocal();
+      }
+    }
+  );
+}
+function loadLocal(){ try{ entries=JSON.parse(localStorage.getItem('pasatg_entries')||'[]'); }catch(e){ entries=[]; } renderResults(); }
+function saveLocal(){ localStorage.setItem('pasatg_entries', JSON.stringify(entries)); }
+async function persistEntry(entry){
+  if(USE_FB && isPro){
+    entry.createdBy=currentUser?currentUser.email:'';
+    entry.createdAt=Date.now();
+    try{ await db.collection('participants').add(entry); }
+    catch(e){
+      alert('Could not save to cloud ('+e.message+'). The record was kept on this device instead.');
+      entry.id='loc_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+      entries.push(entry); saveLocal(); renderResults();
+    }
+  } else {
+    entry.id='loc_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+    entry.createdBy=currentUser?currentUser.email:'';
+    entry.createdAt=Date.now();
+    entries.push(entry); saveLocal(); renderResults();
+  }
+}
+
+
+const ZONE_META={
+  4:{fill:'#00FFB2',stroke:'#00c8a0',name:'Deep corner zone',abbr:'DCZ',pts:'4 pts'},
+  3:{fill:'#9b6dd1',stroke:'#7a48ad',name:'Deep middle zone',abbr:'DMZ',pts:'3 pts'},
+  2:{fill:'#00c8ff',stroke:'#0099cc',name:'Center middle zone',abbr:'CMZ',pts:'2 pts'},
+  1:{fill:'#50c850',stroke:'#3a9440',name:'Kitchen zone',abbr:'KAZ',pts:'1 pt'},
+  0:{fill:'#ff4d6d',stroke:'#cc2244',name:'Out / Net',abbr:'OUT',pts:'0 pts'}
+};
+
+function setHand(h){hand=h;document.getElementById('hand-r').classList.toggle('active',h==='R');document.getElementById('hand-l').classList.toggle('active',h==='L');}
+function trialStroke(i){return(i%10)<5?'FH':'BH';}
+
+function buildTrials(){
+  const c=document.getElementById('trials-container');c.innerHTML='';
+  for(let s=0;s<3;s++){
+    const sd=document.createElement('div');sd.className='set-block';
+    const hdr=document.createElement('div');hdr.className='set-hdr';
+    hdr.innerHTML=`<h3>SET ${s+1} <span style="font-size:10px;font-weight:400;color:var(--text3)">(10 trials)</span></h3><span class="set-tot">Total: <span id="st-${s}">—</span> / 40</span>`;
+    sd.appendChild(hdr);
+    for(let t=0;t<10;t++){
+      const idx=s*10+t;
+      if(t===5){const dv=document.createElement('div');dv.className='set-divider';dv.innerHTML=`<div class="div-line"></div><span class="div-lbl">backhand</span><div class="div-line"></div>`;sd.appendChild(dv);}
+      const stroke=trialStroke(idx);
+      const row=document.createElement('div');row.className='trial-row';
+      row.innerHTML=`<div class="t-num">${idx+1}</div><div class="stroke-tag ${stroke==='FH'?'fh-tag':'bh-tag'}">${stroke}</div><div class="zone-btns" id="zb-${idx}">${ZONES.map(z=>`<button class="zone-btn" onclick="setZone(${idx},${z.score})" data-score="${z.score}">${z.label}</button>`).join('')}</div><div class="sc-disp empty" id="sd-${idx}">—</div>`;
+      sd.appendChild(row);
+    }
+    c.appendChild(sd);
+  }
+}
+
+function setZone(idx,score){
+  scores[idx]=score;
+  document.getElementById(`zb-${idx}`).querySelectorAll('.zone-btn').forEach(b=>{b.className='zone-btn';if(parseInt(b.dataset.score)===score)b.classList.add(`sel-${score}`); });
+  const sd=document.getElementById(`sd-${idx}`);sd.textContent=score;sd.className='sc-disp';
+  updateSummary();drawCourt();
+}
+
+function setFilter(f){currentFilter=f;['all','fh','bh'].forEach(x=>document.getElementById('fb-'+x).classList.toggle('active',x===f));drawCourt();}
+
+function getCounts(filter){
+  const c={4:0,3:0,2:0,1:0,0:0};
+  for(let i=0;i<TOTAL;i++){const v=scores[i];if(v===null)continue;const st=trialStroke(i);if(filter==='fh'&&st!=='FH')continue;if(filter==='bh'&&st!=='BH')continue;c[v]++;}
+  return c;
+}
+
+function hexToRgba(hex,a){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`rgba(${r},${g},${b},${a})`;}
+
+function drawCourt(){
+  const svg=document.getElementById('court-svg');
+  const counts=getCounts(currentFilter);
+  const total=Object.values(counts).reduce((a,b)=>a+b,0);
+  function op(score){if(total===0)return 0.25;const r=counts[score]/total;return counts[score]===0?0.08:0.18+r*0.75;}
+
+  const cL=30,cR=270,cW=240,cx=150;
+  const baselineY=30,deepLineY=74,kitchenBotY=148,netY=250,playerBot=450;
+  const dczW=60;
+
+  let s='';
+  s+=`<rect x="0" y="0" width="300" height="470" fill="#040d12"/>`;
+  s+=`<rect x="${cL}" y="${baselineY}" width="${cW}" height="${netY-baselineY}" fill="#071520" rx="2"/>`;
+  s+=`<rect x="${cL}" y="${kitchenBotY}" width="${cW}" height="${netY-kitchenBotY}" fill="${hexToRgba(ZONE_META[1].fill,op(1))}" stroke="${ZONE_META[1].stroke}" stroke-width="1.2"/>`;
+  s+=`<rect x="${cL}" y="${deepLineY}" width="${cW}" height="${kitchenBotY-deepLineY}" fill="${hexToRgba(ZONE_META[2].fill,op(2))}" stroke="${ZONE_META[2].stroke}" stroke-width="1.2"/>`;
+  s+=`<rect x="${cL}" y="${baselineY}" width="${dczW}" height="${deepLineY-baselineY}" fill="${hexToRgba(ZONE_META[4].fill,op(4))}" stroke="${ZONE_META[4].stroke}" stroke-width="1.2"/>`;
+  s+=`<rect x="${cR-dczW}" y="${baselineY}" width="${dczW}" height="${deepLineY-baselineY}" fill="${hexToRgba(ZONE_META[4].fill,op(4))}" stroke="${ZONE_META[4].stroke}" stroke-width="1.2"/>`;
+  s+=`<rect x="${cL+dczW}" y="${baselineY}" width="${cW-2*dczW}" height="${deepLineY-baselineY}" fill="${hexToRgba(ZONE_META[3].fill,op(3))}" stroke="${ZONE_META[3].stroke}" stroke-width="1.2"/>`;
+
+  s+=`<line x1="${cL}" y1="${baselineY}" x2="${cR}" y2="${baselineY}" stroke="rgba(0,255,178,0.8)" stroke-width="2"/>`;
+  s+=`<line x1="${cL}" y1="${deepLineY}" x2="${cR}" y2="${deepLineY}" stroke="rgba(0,255,178,0.5)" stroke-width="1.2"/>`;
+  s+=`<line x1="${cL}" y1="${kitchenBotY}" x2="${cR}" y2="${kitchenBotY}" stroke="rgba(0,255,178,0.4)" stroke-width="1"/>`;
+  s+=`<line x1="${cL}" y1="${netY}" x2="${cR}" y2="${netY}" stroke="rgba(0,255,178,0.7)" stroke-width="2" stroke-dasharray="6,4"/>`;
+  s+=`<line x1="${cx}" y1="${baselineY}" x2="${cx}" y2="${netY}" stroke="rgba(0,255,178,0.15)" stroke-width="1"/>`;
+  s+=`<line x1="${cL+dczW}" y1="${baselineY}" x2="${cL+dczW}" y2="${deepLineY}" stroke="rgba(0,255,178,0.4)" stroke-width="1"/>`;
+  s+=`<line x1="${cR-dczW}" y1="${baselineY}" x2="${cR-dczW}" y2="${deepLineY}" stroke="rgba(0,255,178,0.4)" stroke-width="1"/>`;
+
+  s+=`<rect x="${cL-8}" y="${netY-4}" width="${cW+16}" height="8" fill="#1a3a4a" rx="2" stroke="rgba(0,200,255,0.4)" stroke-width="1"/>`;
+  s+=`<text x="${cx}" y="${netY+2}" text-anchor="middle" font-size="7" font-weight="700" fill="rgba(0,200,255,0.9)" font-family="monospace">NET</text>`;
+
+  s+=`<rect x="${cL}" y="${netY+8}" width="${cW}" height="${playerBot-netY-8}" fill="#071a10" rx="0"/>`;
+  s+=`<line x1="${cx}" y1="${netY+8}" x2="${cx}" y2="${playerBot}" stroke="rgba(0,255,178,0.12)" stroke-width="1"/>`;
+  s+=`<ellipse cx="${cx}" cy="${netY+28}" rx="40" ry="14" fill="none" stroke="rgba(0,255,178,0.5)" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+  s+=`<text x="${cx}" y="${netY+31}" text-anchor="middle" font-size="8" font-weight="600" fill="rgba(0,255,178,0.8)" font-family="monospace">Drop zone</text>`;
+  s+=`<circle cx="${cx}" cy="${playerBot-48}" r="14" fill="#0a2050" stroke="rgba(0,200,255,0.8)" stroke-width="2"/>`;
+  s+=`<text x="${cx}" y="${playerBot-43}" text-anchor="middle" font-size="11" font-weight="700" fill="#00c8ff" font-family="monospace">P</text>`;
+  s+=`<text x="${cx}" y="${playerBot-27}" text-anchor="middle" font-size="7" fill="rgba(0,200,255,0.6)" font-family="monospace">PLAYER</text>`;
+  s+=`<rect x="${cL}" y="${baselineY}" width="${cW}" height="${playerBot-baselineY}" fill="none" stroke="rgba(0,255,178,0.4)" stroke-width="1.5" rx="2"/>`;
+
+  s+=`<text x="${cx}" y="${baselineY-10}" text-anchor="middle" font-size="8" fill="rgba(0,255,178,0.5)" font-family="monospace">BASELINE</text>`;
+  s+=`<text x="${cx}" y="${playerBot+16}" text-anchor="middle" font-size="7" fill="rgba(0,200,255,0.4)" font-family="monospace">&#x2190; PLAYER SIDE &#x2192;</text>`;
+
+  function zlabel(score,x,y){
+    const cnt=counts[score],pct=total>0?Math.round(cnt/total*100):0;
+    const col=ZONE_META[score].fill;
+    s+=`<text x="${x}" y="${y}" text-anchor="middle" font-size="9" font-weight="700" fill="${col}" font-family="monospace">${ZONE_META[score].abbr}</text>`;
+    s+=`<text x="${x}" y="${y+13}" text-anchor="middle" font-size="11" font-weight="700" fill="${col}" font-family="monospace">${cnt}</text>`;
+    s+=`<text x="${x}" y="${y+24}" text-anchor="middle" font-size="8" fill="${col}" opacity="0.7" font-family="monospace">${pct}%</text>`;
+  }
+  zlabel(4,cL+dczW/2,baselineY+16);
+  zlabel(4,cR-dczW/2,baselineY+16);
+  zlabel(3,cx,baselineY+15);
+  zlabel(2,cx,(deepLineY+kitchenBotY)/2-8);
+  zlabel(1,cx,(kitchenBotY+netY)/2-8);
+
+  svg.innerHTML=s;
+
+  const leg=document.getElementById('heatmap-legend');
+  let lh=`<div style="font-size:9px;color:var(--text3);font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.1em;font-family:'Orbitron',sans-serif;">Zone Data</div>`;
+  [4,3,2,1,0].forEach(sc=>{
+    const m=ZONE_META[sc],cnt=counts[sc],pct=total>0?Math.round(cnt/total*100):0;
+    lh+=`<div class="leg-item"><div class="swatch" style="background:${m.fill}22;border:1px solid ${m.fill}88;box-shadow:0 0 6px ${m.fill}44;"></div><div><div style="font-size:12px;font-weight:700;color:${m.fill};font-family:'Orbitron',sans-serif;">${m.abbr} <span style="font-size:10px;color:var(--text3);font-family:'Inter',sans-serif;font-weight:400;">${m.pts}</span></div><div style="font-size:10px;color:var(--text3);margin-top:1px;">${m.name}</div></div><div style="margin-left:auto;text-align:right;"><div style="font-size:15px;font-weight:700;color:${m.fill};font-family:'Orbitron',sans-serif;">${cnt}</div><div style="font-size:10px;color:var(--text3);">${pct}%</div></div></div>`;
+  });
+  lh+=total>0?`<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border2);font-size:10px;color:var(--text3);">${total} / 30 trials</div>`:`<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border2);font-size:10px;color:var(--text3);font-style:italic;">No scores yet</div>`;
+  leg.innerHTML=lh;
+}
+
+function setScores(s){let t=0,f=0;for(let i=0;i<10;i++){const v=scores[s*10+i];if(v!==null){t+=v;f++;}}return{t,f};}
+
+function updateSummary(){
+  for(let s=0;s<3;s++){const{t,f}=setScores(s);document.getElementById(`st-${s}`).textContent=f>0?t:'—';}
+  const fhS=[0,1,2].map(s=>{let t=0;for(let i=0;i<5;i++){const v=scores[s*10+i];if(v!==null)t+=v;}return t;});
+  const bhS=[0,1,2].map(s=>{let t=0;for(let i=5;i<10;i++){const v=scores[s*10+i];if(v!==null)t+=v;}return t;});
+  const fhCnt=scores.filter((v,i)=>trialStroke(i)==='FH'&&v!==null).length;
+  const bhCnt=scores.filter((v,i)=>trialStroke(i)==='BH'&&v!==null).length;
+  const fhMean=fhCnt===15?(fhS[0]+fhS[1]+fhS[2])/3:null;
+  const bhMean=bhCnt===15?(bhS[0]+bhS[1]+bhS[2])/3:null;
+  const all=scores.filter(v=>v!==null);
+  const setTots=[0,1,2].map(s=>setScores(s).t);
+  const finalScore=all.length===30?(setTots[0]+setTots[1]+setTots[2])/3:null;
+  const maxP=all.length*4,pct=maxP>0?Math.round(all.reduce((a,b)=>a+b,0)/maxP*100):0;
+  document.getElementById('sum-fh').textContent=fhMean!==null?fhMean.toFixed(1):(fhCnt>0?'…':'—');
+  document.getElementById('sum-bh').textContent=bhMean!==null?bhMean.toFixed(1):(bhCnt>0?'…':'—');
+  document.getElementById('sum-final').textContent=finalScore!==null?finalScore.toFixed(1):'—';
+  document.getElementById('sum-pct').textContent=all.length>0?pct+'%':'—';
+  document.getElementById('interp-overall').innerHTML=finalScore!==null?iHTML(oInterp(finalScore),null):'';
+  document.getElementById('interp-fh').innerHTML=fhMean!==null?iHTML(fbInterp(fhMean),'Forehand'):'';
+  document.getElementById('interp-bh').innerHTML=bhMean!==null?iHTML(fbInterp(bhMean),'Backhand'):'';
+  // live partial means for the body map (scale partial totals to a /20 estimate)
+  const fhLive=fhCnt>0?(fhS[0]+fhS[1]+fhS[2])/fhCnt*5:null;
+  const bhLive=bhCnt>0?(bhS[0]+bhS[1]+bhS[2])/bhCnt*5:null;
+  drawBodyMap(fhMean!==null?fhMean:fhLive, bhMean!==null?bhMean:bhLive, fhMean!==null, bhMean!==null);
+}
+
+function levelColor(m){
+  if(m===null||isNaN(m))return{fill:'#13242a',stroke:'#274a42',label:'No data',cls:''};
+  if(m>=18)return{fill:'#00E676',stroke:'#00b85a',label:'Excellent',cls:'excellent'};
+  if(m>=15)return{fill:'#9CCC65',stroke:'#7cb342',label:'Very Good',cls:'verygood'};
+  if(m>=12)return{fill:'#FFD54F',stroke:'#e0b228',label:'Average',cls:'average'};
+  if(m>=9)return{fill:'#FF9800',stroke:'#e07b00',label:'Below Average',cls:'below'};
+  return{fill:'#FF5252',stroke:'#d83434',label:'Poor',cls:'poor'};
+}
+
+function drawBodyMap(fhMean,bhMean,fhFull,bhFull){
+  const svg=document.getElementById('body-svg');
+  if(!svg)return;
+  const fhC=levelColor(fhMean);   // right arm (viewer left)
+  const bhC=levelColor(bhMean);   // left arm (viewer right)
+  const NEUT='#0f2129', NEUT_S='rgba(0,255,178,0.25)';
+
+  function limb(p,color,sc,glow){
+    // p: array of [x,y] joints; draw thick rounded segmented limb with grid ticks
+    let out='';
+    for(let i=0;i<p.length-1;i++){
+      out+=`<line x1="${p[i][0]}" y1="${p[i][1]}" x2="${p[i+1][0]}" y2="${p[i+1][1]}" stroke="${color}" stroke-width="26" stroke-linecap="round"${glow?` filter="url(#glow)"`:''}/>`;
+    }
+    // joint caps
+    p.forEach(j=>{out+=`<circle cx="${j[0]}" cy="${j[1]}" r="13" fill="${color}"/>`;});
+    // grid mesh ticks along each segment
+    for(let i=0;i<p.length-1;i++){
+      const [x0,y0]=p[i],[x1,y1]=p[i+1];
+      for(let t=0.22;t<1;t+=0.26){
+        const mx=x0+(x1-x0)*t, my=y0+(y1-y0)*t;
+        const dx=x1-x0, dy=y1-y0, len=Math.hypot(dx,dy);
+        const nx=-dy/len, ny=dx/len;
+        out+=`<line x1="${mx-nx*12}" y1="${my-ny*12}" x2="${mx+nx*12}" y2="${my+ny*12}" stroke="rgba(4,13,18,0.35)" stroke-width="2"/>`;
+      }
+    }
+    return out;
+  }
+
+  let s='';
+  s+=`<defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
+  s+=`<rect x="0" y="0" width="320" height="460" fill="#040d12"/>`;
+  // faint grid backdrop
+  for(let gx=20;gx<320;gx+=24)s+=`<line x1="${gx}" y1="0" x2="${gx}" y2="460" stroke="rgba(0,255,178,0.04)" stroke-width="1"/>`;
+  for(let gy=20;gy<460;gy+=24)s+=`<line x1="0" y1="${gy}" x2="320" y2="${gy}" stroke="rgba(0,255,178,0.04)" stroke-width="1"/>`;
+
+  const cx=160;
+  // torso
+  s+=`<polygon points="128,120 192,120 200,250 184,265 136,265 120,250" fill="${NEUT}" stroke="${NEUT_S}" stroke-width="2"/>`;
+  // legs
+  s+=`<line x1="146" y1="262" x2="138" y2="360" stroke="${NEUT}" stroke-width="30" stroke-linecap="round"/>`;
+  s+=`<line x1="138" y1="360" x2="134" y2="430" stroke="${NEUT}" stroke-width="26" stroke-linecap="round"/>`;
+  s+=`<line x1="174" y1="262" x2="182" y2="360" stroke="${NEUT}" stroke-width="30" stroke-linecap="round"/>`;
+  s+=`<line x1="182" y1="360" x2="186" y2="430" stroke="${NEUT}" stroke-width="26" stroke-linecap="round"/>`;
+  s+=`<polygon points="128,120 192,120 200,250 184,265 136,265 120,250" fill="none" stroke="${NEUT_S}" stroke-width="2"/>`;
+  // neck + head
+  s+=`<line x1="160" y1="100" x2="160" y2="124" stroke="${NEUT}" stroke-width="18" stroke-linecap="round"/>`;
+  s+=`<circle cx="160" cy="74" r="30" fill="${NEUT}" stroke="${NEUT_S}" stroke-width="2"/>`;
+
+  // RIGHT arm (viewer left) = Forehand
+  s+=limb([[130,128],[96,200],[80,278]], fhC.fill, fhC, fhMean!==null);
+  // LEFT arm (viewer right) = Backhand
+  s+=limb([[190,128],[224,200],[240,278]], bhC.fill, bhC, bhMean!==null);
+
+  // labels
+  s+=`<text x="70" y="305" text-anchor="middle" font-size="11" font-weight="700" fill="${fhC.fill}" font-family="'Orbitron',monospace">FH</text>`;
+  s+=`<text x="70" y="320" text-anchor="middle" font-size="8.5" fill="${fhC.fill}" font-family="monospace">${fhMean!==null?fhMean.toFixed(1):'—'}${fhFull?'':(fhMean!==null?'*':'')}</text>`;
+  s+=`<text x="250" y="305" text-anchor="middle" font-size="11" font-weight="700" fill="${bhC.fill}" font-family="'Orbitron',monospace">BH</text>`;
+  s+=`<text x="250" y="320" text-anchor="middle" font-size="8.5" fill="${bhC.fill}" font-family="monospace">${bhMean!==null?bhMean.toFixed(1):'—'}${bhFull?'':(bhMean!==null?'*':'')}</text>`;
+  // level captions
+  s+=`<text x="70" y="338" text-anchor="middle" font-size="8" fill="${fhC.fill}" opacity="0.85" font-family="monospace">${fhC.label}</text>`;
+  s+=`<text x="250" y="338" text-anchor="middle" font-size="8" fill="${bhC.fill}" opacity="0.85" font-family="monospace">${bhC.label}</text>`;
+
+  svg.innerHTML=s;
+
+  // legend (color scale)
+  const leg=document.getElementById('body-legend');
+  const bands=[['Excellent','18.0 – 20.0','#00E676'],['Very Good','15.0 – 17.9','#9CCC65'],['Average','12.0 – 14.9','#FFD54F'],['Below Average','9.0 – 11.9','#FF9800'],['Poor','0 – 8.9','#FF5252']];
+  let lh=`<div style="font-size:9px;color:var(--text3);font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.1em;font-family:'Orbitron',sans-serif;">Accuracy Scale</div>`;
+  bands.forEach(([lbl,rng,col])=>{
+    lh+=`<div class="leg-item"><div class="swatch" style="background:${col};box-shadow:0 0 8px ${col}66;"></div><div><div style="font-size:12px;font-weight:700;color:${col};font-family:'Orbitron',sans-serif;">${lbl}</div><div style="font-size:10px;color:var(--text3);font-family:monospace;">${rng}</div></div></div>`;
+  });
+  lh+=`<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border2);font-size:10px;color:var(--text3);line-height:1.5;">* = partial (live estimate)<br>Final fills after all 15 trials per stroke.</div>`;
+  leg.innerHTML=lh;
+}
+
+function oInterp(m){
+  if(m>=34)return{cls:'excellent',label:'Excellent',desc:'Highly consistent, tactically optimal placement'};
+  if(m>=27)return{cls:'verygood',label:'Very good',desc:'Strong accuracy with minor inconsistencies'};
+  if(m>=20)return{cls:'average',label:'Average',desc:'Functional accuracy; placement lacks consistency'};
+  if(m>=13)return{cls:'below',label:'Below average',desc:'Inconsistent placement; limited tactical value'};
+  return{cls:'poor',label:'Poor',desc:'Major accuracy deficiencies'};
+}
+function fbInterp(m){
+  if(m>=18)return{cls:'excellent',label:'Excellent'};
+  if(m>=15)return{cls:'verygood',label:'Very good'};
+  if(m>=12)return{cls:'average',label:'Average'};
+  if(m>=9)return{cls:'below',label:'Below average'};
+  return{cls:'poor',label:'Poor'};
+}
+function iHTML(o,extra){return`<div class="interp-box ${o.cls}"><div class="i-lbl ${o.cls}">${o.label}${extra?' · '+extra:''}</div>${o.desc?`<div class="i-desc">${o.desc}</div>`:''}</div>`;}
+
+async function saveEntry(){
+  const code=document.getElementById('p-code').value.trim();
+  if(!code){document.getElementById('p-code').focus();alert('Please enter a participant code.');return;}
+  if(scores.filter(v=>v!==null).length===0){alert('Please enter at least one trial score.');return;}
+  const fhS=[0,1,2].map(s=>{let t=0;for(let i=0;i<5;i++){const v=scores[s*10+i];if(v!==null)t+=v;}return t;});
+  const bhS=[0,1,2].map(s=>{let t=0;for(let i=5;i<10;i++){const v=scores[s*10+i];if(v!==null)t+=v;}return t;});
+  const setTots=[0,1,2].map(s=>setScores(s).t);
+  const fhMean=(fhS[0]+fhS[1]+fhS[2])/3, bhMean=(bhS[0]+bhS[1]+bhS[2])/3;
+  const entry={code,sex:document.getElementById('p-sex').value,age:document.getElementById('p-age').value,exp:document.getElementById('p-exp').value,hand:hand||'—',tester:document.getElementById('p-tester').value,date:document.getElementById('p-date').value,scores:[...scores],setTots,fhMean,bhMean,fhPct:Math.round(fhMean/20*100),bhPct:Math.round(bhMean/20*100),finalScore:(setTots[0]+setTots[1]+setTots[2])/3};
+  await persistEntry(entry);
+  resetForm();
+}
+
+function resetForm(){
+  ['p-code','p-age','p-exp','p-tester'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('p-sex').value='';document.getElementById('p-date').value='';
+  hand=null;document.getElementById('hand-r').classList.remove('active');document.getElementById('hand-l').classList.remove('active');
+  scores=Array(TOTAL).fill(null);buildTrials();updateSummary();drawCourt();
+}
+
+function pillCls(m){if(m>=34)return'e';if(m>=27)return'vg';if(m>=20)return'a';if(m>=13)return'b';return'p';}
+
+function pctColor(p){ const m=p/100*20; const c=levelColor(m); return c.fill; }
+function renderResults(){
+  const card=document.getElementById('results-card');
+  if(!entries||entries.length===0){card.style.display='none';return;}
+  card.style.display='block';
+  const sorted=[...entries].sort((a,b)=>b.finalScore-a.finalScore);
+  let html=`<table><thead><tr><th>#</th><th>Code</th><th>Sex</th><th>Age</th><th>FH %</th><th>BH %</th><th>PASAT-G</th><th>Level</th></tr></thead><tbody>`;
+  sorted.forEach((e,i)=>{
+    const oi=oInterp(e.finalScore);
+    const fhP=(e.fhPct!=null)?e.fhPct:Math.round(e.fhMean/20*100);
+    const bhP=(e.bhPct!=null)?e.bhPct:Math.round(e.bhMean/20*100);
+    html+=`<tr class="clickable" onclick="openDetail('${e.id}')"><td style="color:var(--text3)">${i+1}</td><td style="font-weight:700"><span class="code-link">${e.code}</span></td><td>${e.sex||'—'}</td><td>${e.age||'—'}</td><td><span class="pct-pill" style="background:${pctColor(fhP)}22;color:${pctColor(fhP)};border:1px solid ${pctColor(fhP)}66;">${fhP}%</span></td><td><span class="pct-pill" style="background:${pctColor(bhP)}22;color:${pctColor(bhP)};border:1px solid ${pctColor(bhP)}66;">${bhP}%</span></td><td style="font-weight:700;color:var(--accent);font-family:'Orbitron',sans-serif;">${e.finalScore.toFixed(1)}</td><td><span class="pill pill-${pillCls(e.finalScore)}">${oi.label}</span></td></tr>`;
+  });
+  html+='</tbody></table><div style="font-size:10px;color:var(--text3);margin-top:10px;text-align:center;">Tap any row to view full participant breakdown</div>';
+  document.getElementById('results-body').innerHTML=html;
+  renderAnalytics();
+}
+
+function openDetail(id){
+  const e=entries.find(x=>String(x.id)===String(id));
+  if(!e)return;
+  const oi=oInterp(e.finalScore);
+  const fhP=(e.fhPct!=null)?e.fhPct:Math.round(e.fhMean/20*100);
+  const bhP=(e.bhPct!=null)?e.bhPct:Math.round(e.bhMean/20*100);
+  const fhc=levelColor(e.fhMean), bhc=levelColor(e.bhMean);
+  let grid='';
+  for(let s=0;s<3;s++){
+    grid+=`<div style="font-size:10px;color:var(--text3);margin:8px 0 4px;font-family:'Orbitron',sans-serif;letter-spacing:0.06em;">SET ${s+1} &nbsp;<span style="color:var(--text2)">(FH 1-5 &middot; BH 6-10)</span></div><div class="trial-grid">`;
+    for(let t=0;t<10;t++){
+      const v=e.scores?e.scores[s*10+t]:null;
+      const col=(v!=null)?ZONE_META[v].fill:'#13242a';
+      const txt=(v!=null)?v:'';
+      grid+=`<div class="tcell" style="background:${col};${v==null?'color:var(--text3);border:1px solid var(--border2);':''}">${txt}</div>`;
+    }
+    grid+='</div>';
+  }
+  const html=`
+    <div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;color:var(--accent);letter-spacing:0.06em;">${e.code}</div>
+    <div style="font-size:12px;color:var(--text2);margin-top:4px;">${e.sex||'—'} &middot; Age ${e.age||'—'} &middot; ${e.hand||'—'} hand &middot; ${e.exp?e.exp+' yrs exp':'—'}</div>
+    <div style="font-size:11px;color:var(--text3);margin-top:2px;">Tester: ${e.tester||'—'} &nbsp;|&nbsp; Date: ${e.date||'—'} ${e.createdBy?'&nbsp;|&nbsp; by '+e.createdBy:''}</div>
+    <div class="detail-grid">
+      <div class="detail-stat"><div class="v" style="color:${fhc.fill}">${fhP}%</div><div class="l">Forehand &middot; ${fhc.label}</div></div>
+      <div class="detail-stat"><div class="v" style="color:${bhc.fill}">${bhP}%</div><div class="l">Backhand &middot; ${bhc.label}</div></div>
+      <div class="detail-stat"><div class="v">${e.finalScore.toFixed(1)}</div><div class="l">PASAT-G Score</div></div>
+      <div class="detail-stat"><div class="v">${e.setTots[0]}/${e.setTots[1]}/${e.setTots[2]}</div><div class="l">Set Totals</div></div>
+    </div>
+    <div style="margin-bottom:6px;"><span class="pill pill-${pillCls(e.finalScore)}">${oi.label}</span> <span style="font-size:11px;color:var(--text2);margin-left:6px;">${oi.desc}</span></div>
+    ${grid}
+    <div style="display:flex;gap:8px;margin-top:1rem;">
+      <button class="btn-exp" style="flex:1" onclick="exportOne('${e.id}')"><i class="ti ti-download" style="margin-right:4px"></i>Export this participant</button>
+    </div>`;
+  document.getElementById('detail-content').innerHTML=html;
+  document.getElementById('detail-modal').classList.add('open');
+}
+function closeDetail(){ document.getElementById('detail-modal').classList.remove('open'); }
+
+function exportOne(id){
+  const e=entries.find(x=>String(x.id)===String(id)); if(!e)return;
+  const oi=oInterp(e.finalScore);
+  let csv='Code,Sex,Age,Exp,Hand,Tester,Date,';
+  for(let s=1;s<=3;s++)for(let t=1;t<=10;t++)csv+=`S${s}T${t},`;
+  csv+='Set1,Set2,Set3,FH_Mean,BH_Mean,FH_Pct,BH_Pct,PASAT_G,Level\n';
+  csv+=`${e.code},${e.sex},${e.age},${e.exp},${e.hand},${e.tester},${e.date},`;
+  e.scores.forEach(v=>csv+=`${v!==null?v:''},`);
+  const fhP=(e.fhPct!=null)?e.fhPct:Math.round(e.fhMean/20*100);
+  const bhP=(e.bhPct!=null)?e.bhPct:Math.round(e.bhMean/20*100);
+  csv+=`${e.setTots[0]},${e.setTots[1]},${e.setTots[2]},${e.fhMean.toFixed(2)},${e.bhMean.toFixed(2)},${fhP},${bhP},${e.finalScore.toFixed(2)},${oi.label}\n`;
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='PASAT_G_'+e.code.replace(/[^a-z0-9]/gi,'_')+'.csv';a.click();
+}
+
+function exportCSV(){
+  let csv='Rank,Code,Sex,Age,Exp,Hand,Tester,Date,';
+  for(let s=1;s<=3;s++)for(let t=1;t<=10;t++)csv+=`S${s}T${t},`;
+  csv+='Set1,Set2,Set3,FH_Mean,BH_Mean,FH_Pct,BH_Pct,PASAT_G,Level\n';
+  const sorted=[...entries].sort((a,b)=>b.finalScore-a.finalScore);
+  sorted.forEach((e,i)=>{
+    const oi=oInterp(e.finalScore);
+    csv+=`${i+1},${e.code},${e.sex},${e.age},${e.exp},${e.hand},${e.tester},${e.date},`;
+    e.scores.forEach(v=>csv+=`${v!==null?v:''},`);
+    const fhP=(e.fhPct!=null)?e.fhPct:Math.round(e.fhMean/20*100), bhP=(e.bhPct!=null)?e.bhPct:Math.round(e.bhMean/20*100);
+    csv+=`${e.setTots[0]},${e.setTots[1]},${e.setTots[2]},${e.fhMean.toFixed(2)},${e.bhMean.toFixed(2)},${fhP},${bhP},${e.finalScore.toFixed(2)},${oi.label}\n`;
+  });
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='PASAT_G_results.csv';a.click();
+}
+
+
+/* =====================================================================
+   RESEARCH ANALYTICS ENGINE
+   Aggregates all saved samples. Implements:
+   - Descriptive stats (mean, SD)
+   - Normality: Chi-Square goodness-of-fit on frequency distribution
+   - Validity: item-total correlation (point-biserial style Pearson r)
+       for items = zones, sets, and FH/BH subtests (separate tables)
+   - Reliability: Hoyt's ANOVA-based coefficient (sets as repeated trials)
+   - Assessment norms (mean +/- SD bands) with 5% acceptance rule
+   All formulas computed client-side; n flagged when too small.
+   ===================================================================== */
+
+function _mean(a){return a.length?a.reduce((x,y)=>x+y,0)/a.length:0;}
+function _sd(a,sample){if(a.length<2)return 0;const m=_mean(a);const ss=a.reduce((x,y)=>x+(y-m)*(y-m),0);return Math.sqrt(ss/(a.length-(sample?1:0)));}
+function _pearson(x,y){
+  const n=x.length; if(n<2)return NaN;
+  const mx=_mean(x),my=_mean(y);
+  let sxy=0,sxx=0,syy=0;
+  for(let i=0;i<n;i++){const dx=x[i]-mx,dy=y[i]-my;sxy+=dx*dy;sxx+=dx*dx;syy+=dy*dy;}
+  if(sxx===0||syy===0)return NaN;
+  return sxy/Math.sqrt(sxx*syy);
+}
+// Pearson critical r at alpha=0.05 (two-tailed) by df=n-2 (lookup + approximation)
+function _critR(n){
+  const df=n-2; if(df<1)return NaN;
+  const tbl={1:0.997,2:0.950,3:0.878,4:0.811,5:0.754,6:0.707,7:0.666,8:0.632,9:0.602,10:0.576,
+    11:0.553,12:0.532,13:0.514,14:0.497,15:0.482,16:0.468,17:0.456,18:0.444,19:0.433,20:0.423,
+    25:0.381,30:0.349,35:0.325,40:0.304,45:0.288,50:0.273,60:0.250,70:0.232,80:0.217,90:0.205,100:0.195};
+  if(tbl[df])return tbl[df];
+  const keys=Object.keys(tbl).map(Number).sort((a,b)=>a-b);
+  for(let i=0;i<keys.length-1;i++){if(df>keys[i]&&df<keys[i+1]){const a=keys[i],b=keys[i+1];return tbl[a]+(tbl[b]-tbl[a])*(df-a)/(b-a);}}
+  return tbl[100];
+}
+// Chi-square critical at alpha=0.05 by df
+function _critChi(df){
+  const tbl={1:3.841,2:5.991,3:7.815,4:9.488,5:11.070,6:12.592,7:14.067,8:15.507,9:16.919,10:18.307,11:19.675,12:21.026};
+  return tbl[df]||(df+Math.sqrt(2*df)*1.645);
+}
+// Standard normal CDF
+function _normCdf(z){return 0.5*(1+_erf(z/Math.SQRT2));}
+function _erf(x){const t=1/(1+0.3275911*Math.abs(x));
+  const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);
+  return x>=0?y:-y;}
+
+function gatherStats(){
+  const E=entries.filter(e=>e&&e.scores&&e.scores.length===30&&e.scores.every(v=>v!==null));
+  const n=E.length;
+  const totals=E.map(e=>e.scores.reduce((a,b)=>a+b,0));        // total raw points (0..120)
+  const finals=E.map(e=>e.finalScore);
+  const fh=E.map(e=>e.fhMean), bh=E.map(e=>e.bhMean);
+  // set scores per participant (0..40 each)
+  const setScore=(e,s)=>{let t=0;for(let i=0;i<10;i++)t+=e.scores[s*10+i];return t;};
+  const sets=[0,1,2].map(s=>E.map(e=>setScore(e,s)));
+  // zone totals per participant (count*value already in scores; here use per-zone frequency-weighted points)
+  const zoneScore=(e,z)=>{let t=0;for(let i=0;i<30;i++){if(e.scores[i]===z)t+=z;}return t;};
+  const zones=[4,3,2,1,0].map(z=>E.map(e=>zoneScore(e,z)));
+  return {E,n,totals,finals,fh,bh,sets,zones,setScore};
+}
+
+function itemTotalTable(label,items,itemLabels,n){
+  // items: array of arrays (each item's per-participant scores); total = sum across items
+  if(n<3) return `<div style="font-size:11px;color:var(--text3);margin:4px 0 10px;">${label}: needs n &ge; 3 (have ${n}).</div>`;
+  const total=[];
+  for(let p=0;p<n;p++){let s=0;items.forEach(it=>s+=it[p]);total.push(s);}
+  const crit=_critR(n);
+  let rows='';
+  items.forEach((it,i)=>{
+    // corrected item-total (subtract item from total)
+    const rest=total.map((t,p)=>t-it[p]);
+    const r=_pearson(it,rest);
+    const valid=!isNaN(r)&&Math.abs(r)>=crit;
+    rows+=`<tr><td>${itemLabels[i]}</td><td>${_mean(it).toFixed(2)}</td><td>${_sd(it,true).toFixed(2)}</td><td>${isNaN(r)?'\u2014':r.toFixed(3)}</td><td><span class="pill ${valid?'pill-e':'pill-p'}">${valid?'Valid':'Reject'}</span></td></tr>`;
+  });
+  return `<div style="font-size:12px;font-weight:700;color:var(--accent2);margin:14px 0 6px;font-family:'Orbitron',sans-serif;">${label}</div>
+    <table class="stat-tbl"><thead><tr><th>Item</th><th>Mean</th><th>SD</th><th>r (item-total)</th><th>Decision (5%)</th></tr></thead><tbody>${rows}</tbody></table>
+    <div style="font-size:10px;color:var(--text3);margin-top:4px;">Critical r (df=${n-2}, &alpha;=.05) = ${isNaN(crit)?'\u2014':crit.toFixed(3)}. Corrected item-total correlation.</div>`;
+}
+
+function chiSquareNormality(data,label){
+  const n=data.length;
+  if(n<8) return {html:`<div style="font-size:11px;color:var(--text3);">${label}: needs n &ge; 8 for a meaningful Chi-Square (have ${n}).</div>`};
+  const m=_mean(data), sd=_sd(data,true);
+  if(sd===0) return {html:`<div style="font-size:11px;color:var(--text3);">${label}: no variance.</div>`};
+  // Bins: use k classes (Sturges-ish, capped 4..8)
+  let k=Math.max(4,Math.min(8,Math.round(1+3.322*Math.log10(n))));
+  const mn=Math.min(...data),mx=Math.max(...data);
+  const w=(mx-mn)/k||1;
+  const obs=new Array(k).fill(0);
+  data.forEach(v=>{let b=Math.floor((v-mn)/w);if(b>=k)b=k-1;if(b<0)b=0;obs[b]++;});
+  // expected from normal dist over each bin
+  let chi=0; const exp=[];
+  for(let i=0;i<k;i++){
+    const lo=mn+i*w, hi=(i===k-1)?Infinity:mn+(i+1)*w;
+    const loEff=(i===0)?-Infinity:lo;
+    const p=_normCdf((hi-m)/sd)-_normCdf((loEff-m)/sd);
+    const e=p*n; exp.push(e);
+    if(e>0)chi+=Math.pow(obs[i]-e,2)/e;
+  }
+  const df=Math.max(1,k-2-1); // k - 1 - (2 estimated params)
+  const crit=_critChi(df);
+  const normal=chi<=crit;
+  let bars='';
+  const maxv=Math.max(...obs,...exp.map(e=>e));
+  for(let i=0;i<k;i++){
+    const oh=Math.round(obs[i]/maxv*70), eh=Math.round(exp[i]/maxv*70);
+    const lo=(mn+i*w).toFixed(0), hi=(mn+(i+1)*w).toFixed(0);
+    bars+=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
+      <div style="display:flex;align-items:flex-end;gap:2px;height:74px;">
+        <div title="Observed ${obs[i]}" style="width:9px;height:${oh}px;background:var(--accent);border-radius:2px 2px 0 0;"></div>
+        <div title="Expected ${exp[i].toFixed(1)}" style="width:9px;height:${eh}px;background:var(--purple);border-radius:2px 2px 0 0;opacity:0.8;"></div>
+      </div>
+      <div style="font-size:8px;color:var(--text3);font-family:monospace;">${lo}-${hi}</div></div>`;
+  }
+  const html=`
+    <div style="display:flex;gap:2px;align-items:flex-end;margin:8px 0 4px;">${bars}</div>
+    <div style="font-size:9px;color:var(--text3);margin-bottom:8px;"><span style="color:var(--accent)">&#9632; Observed</span> &nbsp; <span style="color:var(--purple)">&#9632; Expected (normal)</span></div>
+    <table class="stat-tbl"><tbody>
+      <tr><td>n</td><td>${n}</td><td>Mean</td><td>${m.toFixed(2)}</td></tr>
+      <tr><td>SD</td><td>${sd.toFixed(2)}</td><td>Classes (k)</td><td>${k}</td></tr>
+      <tr><td>&chi;&sup2; computed</td><td><b>${chi.toFixed(3)}</b></td><td>&chi;&sup2; crit (df=${df})</td><td>${crit.toFixed(3)}</td></tr>
+      <tr><td>Decision (&alpha;=.05)</td><td colspan="3"><span class="pill ${normal?'pill-e':'pill-p'}">${normal?'Normally distributed (accept H\u2080)':'Not normal (reject H\u2080)'}</span></td></tr>
+    </tbody></table>`;
+  return {html,chi,crit,df,normal,m,sd,n};
+}
+
+function hoytReliability(sets,n){
+  // sets: array of 3 arrays (set scores per participant). Two-way ANOVA without replication.
+  if(n<3) return {html:`<div style="font-size:11px;color:var(--text3);">Needs n &ge; 3 (have ${n}).</div>`};
+  const k=sets.length; // conditions (3 sets)
+  // grand mean
+  let all=[]; for(let s=0;s<k;s++)all=all.concat(sets[s]);
+  const N=all.length, gm=_mean(all);
+  // SS total
+  let ssT=0; all.forEach(v=>ssT+=(v-gm)*(v-gm));
+  // SS between subjects (rows)
+  let ssSubj=0;
+  for(let p=0;p<n;p++){let rowMean=0;for(let s=0;s<k;s++)rowMean+=sets[s][p];rowMean/=k;ssSubj+=k*(rowMean-gm)*(rowMean-gm);}
+  // SS between sets (columns / trials)
+  let ssTrial=0;
+  for(let s=0;s<k;s++){const cm=_mean(sets[s]);ssTrial+=n*(cm-gm)*(cm-gm);}
+  const ssErr=ssT-ssSubj-ssTrial;
+  const dfSubj=n-1, dfTrial=k-1, dfErr=(n-1)*(k-1);
+  const msSubj=ssSubj/dfSubj;
+  const msErr=ssErr/(dfErr||1);
+  // Hoyt reliability = (MSsubj - MSerr) / MSsubj
+  let rel=(msSubj-msErr)/msSubj;
+  if(!isFinite(rel))rel=0;
+  let interp='Poor';
+  if(rel>=0.9)interp='Excellent';else if(rel>=0.8)interp='Good';else if(rel>=0.7)interp='Acceptable';else if(rel>=0.6)interp='Questionable';else if(rel>=0.5)interp='Poor';else interp='Unacceptable';
+  const ok=rel>=0.7;
+  const html=`
+    <table class="stat-tbl"><thead><tr><th>Source</th><th>SS</th><th>df</th><th>MS</th></tr></thead><tbody>
+      <tr><td>Between participants</td><td>${ssSubj.toFixed(2)}</td><td>${dfSubj}</td><td>${msSubj.toFixed(3)}</td></tr>
+      <tr><td>Between sets (trials)</td><td>${ssTrial.toFixed(2)}</td><td>${dfTrial}</td><td>${(ssTrial/dfTrial).toFixed(3)}</td></tr>
+      <tr><td>Error (residual)</td><td>${ssErr.toFixed(2)}</td><td>${dfErr}</td><td>${msErr.toFixed(3)}</td></tr>
+      <tr><td>Total</td><td>${ssT.toFixed(2)}</td><td>${N-1}</td><td>&mdash;</td></tr>
+    </tbody></table>
+    <div class="detail-grid" style="grid-template-columns:1fr 1fr;margin:10px 0 0;">
+      <div class="detail-stat"><div class="v">${rel.toFixed(3)}</div><div class="l">Hoyt r&#8341;&#8341;</div></div>
+      <div class="detail-stat"><div class="v" style="font-size:14px;color:${ok?'var(--accent)':'var(--red)'}">${interp}</div><div class="l">Reliability</div></div>
+    </div>
+    <div style="font-size:10px;color:var(--text3);margin-top:6px;">Hoyt (1941) ANOVA method, sets as repeated trials. r = (MS<sub>subj</sub> &minus; MS<sub>err</sub>) / MS<sub>subj</sub>. Acceptable &ge; 0.70.</div>`;
+  return {html,rel,interp,ok};
+}
+
+function normsTable(finals,n){
+  if(n<2) return `<div style="font-size:11px;color:var(--text3);">Needs n &ge; 2.</div>`;
+  const m=_mean(finals), sd=_sd(finals,true);
+  const band=(lo,hi)=>`${lo===null?'\u2212\u221E':lo.toFixed(1)} \u2013 ${hi===null?'+\u221E':hi.toFixed(1)}`;
+  const rows=[
+    ['Excellent (&gt; +1.5 SD)', m+1.5*sd, null,'pill-e'],
+    ['Above average (+0.5 to +1.5 SD)', m+0.5*sd, m+1.5*sd,'pill-vg'],
+    ['Average (&minus;0.5 to +0.5 SD)', m-0.5*sd, m+0.5*sd,'pill-a'],
+    ['Below average (&minus;1.5 to &minus;0.5 SD)', m-1.5*sd, m-0.5*sd,'pill-b'],
+    ['Poor (&lt; &minus;1.5 SD)', null, m-1.5*sd,'pill-p'],
+  ];
+  let body='';
+  rows.forEach(r=>{body+=`<tr><td><span class="pill ${r[3]}">${r[0]}</span></td><td>${band(r[1],r[2])}</td></tr>`;});
+  return `<div class="detail-grid" style="grid-template-columns:1fr 1fr;margin:0 0 10px;">
+      <div class="detail-stat"><div class="v">${m.toFixed(2)}</div><div class="l">Mean (PASAT-G)</div></div>
+      <div class="detail-stat"><div class="v">${sd.toFixed(2)}</div><div class="l">Std. Deviation</div></div>
+    </div>
+    <table class="stat-tbl"><thead><tr><th>Norm category</th><th>PASAT-G score range</th></tr></thead><tbody>${body}</tbody></table>
+    <div style="font-size:10px;color:var(--text3);margin-top:4px;">Norms from sample mean &plusmn; SD. Recompute with full normative sample before formal use.</div>`;
+}
+
+function _section(title,inner){return `<div style="margin-bottom:1.5rem;"><div class="card-title" style="margin-bottom:8px;">${title}</div>${inner}</div>`;}
+
+function renderAnalytics(){
+  const card=document.getElementById('analytics-card');
+  const S=gatherStats();
+  if(S.n<2){ card.style.display='none'; return; }
+  card.style.display='block';
+  if(!isPro){ document.getElementById('analytics-lock').style.display='block'; document.getElementById('analytics-body').innerHTML=''; return; }
+  document.getElementById('analytics-lock').style.display='none';
+  let h='';
+  h+=`<div class="detail-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:1rem;">
+      <div class="detail-stat"><div class="v">${S.n}</div><div class="l">Complete samples</div></div>
+      <div class="detail-stat"><div class="v">${_mean(S.finals).toFixed(1)}</div><div class="l">Mean PASAT-G</div></div>
+      <div class="detail-stat"><div class="v">${_mean(S.fh).toFixed(1)}</div><div class="l">Mean FH</div></div>
+      <div class="detail-stat"><div class="v">${_mean(S.bh).toFixed(1)}</div><div class="l">Mean BH</div></div>
+    </div>`;
+
+  // 1. Normality (Chi-Square) on total/final scores
+  const norm=chiSquareNormality(S.finals,'PASAT-G score');
+  h+=_section('1 &middot; Normality Test &mdash; Chi-Square (frequency distribution)', norm.html);
+
+  // 2. Validity: item-total tables (zones, sets, FH/BH)
+  let val='';
+  val+=itemTotalTable('Zones as items (DCZ, DMZ, CMZ, KAZ, Out)', S.zones, ['DCZ (4)','DMZ (3)','CMZ (2)','KAZ (1)','Out (0)'], S.n);
+  val+=itemTotalTable('Sets as items (Set 1, 2, 3)', S.sets, ['Set 1','Set 2','Set 3'], S.n);
+  val+=itemTotalTable('Subtests as items (Forehand, Backhand)', [S.fh,S.bh], ['Forehand','Backhand'], S.n);
+  h+=_section('2 &middot; Validity Test &mdash; item-total correlation', val);
+
+  // 3. Reliability (Hoyt) using sets
+  const rel=hoytReliability(S.sets,S.n);
+  h+=_section('3 &middot; Reliability Test &mdash; Hoyt formula (sets as trials)', rel.html);
+
+  // 4. Norms
+  h+=_section('4 &middot; Assessment Norms &mdash; Mean &plusmn; SD (5% level)', normsTable(S.finals,S.n));
+
+  document.getElementById('analytics-body').innerHTML=h;
+  window._lastStats={S,norm,rel};
+}
+
+function exportStats(){
+  if(!isPro){alert('Stats export is a Pro feature. Unlock Pro to use it.');return;}
+  const S=gatherStats();
+  if(S.n<2){alert('Need at least 2 complete samples for statistics.');return;}
+  const L=[];
+  L.push('PASAT-G Research Analytics Export');
+  L.push('Generated,'+new Date().toISOString());
+  L.push('Complete samples (n),'+S.n);
+  L.push('');
+  L.push('DESCRIPTIVE STATISTICS,Mean,SD');
+  L.push('PASAT-G score,'+_mean(S.finals).toFixed(3)+','+_sd(S.finals,true).toFixed(3));
+  L.push('Forehand,'+_mean(S.fh).toFixed(3)+','+_sd(S.fh,true).toFixed(3));
+  L.push('Backhand,'+_mean(S.bh).toFixed(3)+','+_sd(S.bh,true).toFixed(3));
+  L.push('Total raw (0-120),'+_mean(S.totals).toFixed(3)+','+_sd(S.totals,true).toFixed(3));
+  L.push('');
+  const norm=chiSquareNormality(S.finals,'x');
+  L.push('NORMALITY (CHI-SQUARE)');
+  if(norm.chi!==undefined){
+    L.push('Chi-square,'+norm.chi.toFixed(3));
+    L.push('df,'+norm.df);
+    L.push('Critical (a=.05),'+norm.crit.toFixed(3));
+    L.push('Decision,'+(norm.normal?'Normal (accept H0)':'Not normal (reject H0)'));
+  } else { L.push('Insufficient n'); }
+  L.push('');
+  function valBlock(name,items,labels){
+    L.push('VALIDITY (ITEM-TOTAL) - '+name);
+    L.push('Item,Mean,SD,r,Decision(5%)');
+    const total=[];for(let p=0;p<S.n;p++){let s=0;items.forEach(it=>s+=it[p]);total.push(s);}
+    const crit=_critR(S.n);
+    items.forEach((it,i)=>{const rest=total.map((t,p)=>t-it[p]);const r=_pearson(it,rest);const ok=!isNaN(r)&&Math.abs(r)>=crit;
+      L.push(labels[i]+','+_mean(it).toFixed(3)+','+_sd(it,true).toFixed(3)+','+(isNaN(r)?'NA':r.toFixed(3))+','+(ok?'Valid':'Reject'));});
+    L.push('Critical r (df='+(S.n-2)+'),'+(isNaN(crit)?'NA':crit.toFixed(3)));
+    L.push('');
+  }
+  valBlock('Zones',S.zones,['DCZ','DMZ','CMZ','KAZ','Out']);
+  valBlock('Sets',S.sets,['Set1','Set2','Set3']);
+  valBlock('Subtests',[S.fh,S.bh],['Forehand','Backhand']);
+  const rel=hoytReliability(S.sets,S.n);
+  L.push('RELIABILITY (HOYT)');
+  if(rel.rel!==undefined){L.push('Hoyt r,'+rel.rel.toFixed(3));L.push('Interpretation,'+rel.interp);}
+  else L.push('Insufficient n');
+  L.push('');
+  const m=_mean(S.finals),sd=_sd(S.finals,true);
+  L.push('ASSESSMENT NORMS (Mean +/- SD)');
+  L.push('Mean,'+m.toFixed(3));L.push('SD,'+sd.toFixed(3));
+  L.push('Excellent,> '+(m+1.5*sd).toFixed(2));
+  L.push('Above average,'+(m+0.5*sd).toFixed(2)+' to '+(m+1.5*sd).toFixed(2));
+  L.push('Average,'+(m-0.5*sd).toFixed(2)+' to '+(m+0.5*sd).toFixed(2));
+  L.push('Below average,'+(m-1.5*sd).toFixed(2)+' to '+(m-0.5*sd).toFixed(2));
+  L.push('Poor,< '+(m-1.5*sd).toFixed(2));
+  const blob=new Blob([L.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='PASAT_G_analytics.csv';a.click();
+}
+
+
+function resetAllData(){
+  const email=currentUser?currentUser.email:'';
+  if(!email || !ADMIN_EMAIL || email.toLowerCase()!==ADMIN_EMAIL.toLowerCase()){
+    alert('Only the admin account can clear all data.');
+    return;
+  }
+  const typed=prompt('This permanently deletes ALL saved participant records for everyone. This cannot be undone.\n\nType  DELETE  to confirm:');
+  if(typed===null) return;
+  if(typed.trim().toUpperCase()!=='DELETE'){ alert('Cancelled \u2014 confirmation text did not match.'); return; }
+  if(USE_FB){
+    const btn=document.getElementById('btn-reset-all'); if(btn){btn.disabled=true;btn.textContent='Deleting...';}
+    db.collection('participants').get().then(snap=>{
+      const batchSize=400; let docs=snap.docs.slice();
+      function deleteChunk(){
+        if(docs.length===0){
+          if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-trash" style="margin-right:4px"></i>Clear All';}
+          alert('All cloud records deleted.');
+          return;
+        }
+        const chunk=docs.splice(0,batchSize);
+        const batch=db.batch();
+        chunk.forEach(d=>batch.delete(d.ref));
+        batch.commit().then(deleteChunk).catch(e=>{alert('Error deleting: '+e.message); if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-trash" style="margin-right:4px"></i>Clear All';}});
+      }
+      deleteChunk();
+    }).catch(e=>{alert('Error reading data: '+e.message);});
+  } else {
+    localStorage.removeItem('pasatg_entries');
+    entries=[];
+    renderResults();
+    alert('All local records cleared on this device.');
+  }
+}
+loadProState();
+buildTrials();updateSummary();drawCourt();
+initBackend();
+document.getElementById('auth-pass').addEventListener('keydown',e=>{if(e.key==='Enter')authSubmit();});
+document.getElementById('auth-email').addEventListener('keydown',e=>{if(e.key==='Enter')authSubmit();});
+if(typeof GOATCOUNTER_CODE!=='undefined' && GOATCOUNTER_CODE){
+  const ga=document.createElement('script');
+  ga.async=true; ga.dataset.goatcounter='https://'+GOATCOUNTER_CODE+'.goatcounter.com/count';
+  ga.src='https://gc.zgo.at/count.js';
+  document.body.appendChild(ga);
+}
+if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("./service-worker.js").catch(()=>{});});}
+</script>
+</body>
+</html>

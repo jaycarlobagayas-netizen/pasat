@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    // Must match ADMIN_EMAIL in config.js
+    function isAdmin() {
+      return signedIn() && request.auth.token.email == 'jaycarlobagayas@gmail.com';
+    }
+
+    match /participants/{docId} {
+      // Any signed-in tester can view the shared research dataset
+      allow read: if signedIn();
+
+      // Any signed-in tester can add a record, but it must be a
+      // well-formed PASAT-G entry stamped with their own email
+      allow create: if signedIn()
+        && request.resource.data.createdBy == request.auth.token.email
+        && request.resource.data.createdAt is number
+        && request.resource.data.finalScore is number
+        && request.resource.data.finalScore >= 0
+        && request.resource.data.finalScore <= 40
+        && request.resource.data.scores is list
+        && request.resource.data.scores.size() == 30
+        && request.resource.data.code is string
+        && request.resource.data.code.size() > 0
+        && request.resource.data.code.size() <= 40;
+
+      // Records are immutable once saved (research-data integrity)
+      allow update: if false;
+
+      // Only the admin account can delete
+      allow delete: if isAdmin();
+    }
+
+    // Everything else in the database is off limits
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
