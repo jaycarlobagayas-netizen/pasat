@@ -97,3 +97,37 @@ security(license): rotate default LICENSE_SALT; add local-only Pro key generator
 chore(netlify): add netlify.toml with security headers, CSP, cache policy, and redirects
 feat(analytics): optional GoatCounter integration (free, cookie-less), disabled by default
 ```
+
+## 8. Update — Interactive nine-zone court (v3.1)
+
+The court model was rebuilt to the published PASAT-G nine-zone geometry, and the court itself is now the primary scoring input.
+
+**Court geometry** now matches the plan-view/3D figures exactly: scoring half 20 ft × 22 ft; depth bands Kitchen 0–7 ft, Middle 7–17 ft, Deep 17–22 ft; slanted lateral dividers `x = 5 − d/22` and `x = 15 + d/22` (center corridor 10 ft at the net → 12 ft at the baseline; divider crossings at 4.682 / 4.227 / 4.000 ft and mirrored). Zones and points: DCZ ×2 = 4 · DMZ/LMZ/RMZ = 3 · CMZ/KAZ-L/KAZ-R = 2 · KAZ-M = 1 · Out/Net = 0.
+
+**Tap-to-score:** an "Interactive Court" panel sits above the trial list. Tapping the exact landing spot resolves the zone with the slant equations, records the points for the active trial, and auto-advances to the next unscored trial. A chip shows what's being scored ("Trial 7 · SET 1 · BH"); OUT/NET and Undo buttons sit beside it; tapping a trial's number re-selects it for re-scoring. The 0–4 buttons per trial still work as a fallback. Each tap also stores the zone code and the landing coordinates (0.1 ft resolution), so the heatmap now shows numbered FH/BH landing dots plus live per-zone counts, saved records carry `zones` and `pts` (backward compatible — old records still open fine), the participant detail modal shows a shot landing map, and both CSV exports gained per-trial zone columns.
+
+Verified by automated tests: 14 zone-boundary cases (including slant behavior), full tap → score → undo → re-score → save → detail-map flow, zero console errors.
+
+```
+feat(court): rebuild court to nine-zone PASAT-G model with slanted lateral dividers
+feat(scoring): tap-to-score on the court with auto-advance, undo, OUT button, and trial re-selection
+feat(heatmap): per-zone live counts and numbered FH/BH landing dots from real tap coordinates
+feat(data): persist zone codes and landing points per trial; add zone columns to CSV exports; landing map in detail view
+chore(sw): bump cache to pasat-g-v3
+```
+
+## 9. Update — Exact plan-view replica + admin panel (v3.2)
+
+The interactive court was re-rendered as a faithful replica of the published plan-view figure: horizontal orientation with the full 44 ft court — serving half on the left (Right/Left service boxes, serving-side kitchen strip, Player and Feeder markers with feed arrows), dashed net, and the scoring half using the reference color palette (blue DCZ, teal 3-zones, light-green 2-zones, cream KAZ-M, slate = 0). Zone shapes, the slanted divider angles, band depths, and label placement follow the reference exactly; nothing was simplified.
+
+Hit detection and rendering share one geometry: the same feet↔pixel functions (`_pd`/`_pw`) draw the polygons and invert the click coordinates, and `zoneAt()` applies the divider equations `x = 5 − y/22`, `x = 15 + y/22` directly. Because both layers use identical math, the clickable areas align perfectly with the drawing at every zoom/screen size, and boundary taps resolve to the correct zone. Verified with 17 automated click tests, including taps 0.1 ft on either side of the slanted dividers at their published crossing values (4.682 ft at the kitchen line, 15.773 ft at the deep line).
+
+Admin capability: signed in as `ADMIN_EMAIL`, the Results card now shows **Admin · Records by account** — every account that has saved records, with per-account "Delete records" (batched Firestore deletes; the security rules only permit deletes from the admin's verified token, so this cannot be spoofed client-side). Deleting a user's *login* remains a 2-click action in Firebase console → Authentication → Users (documented in the guide) — client-side code can never delete other users' auth accounts, by Firebase design, and the serverless alternative would require a paid plan.
+
+```
+feat(court): exact plan-view replica — horizontal layout, reference palette, serving half, feeder/player, dashed net
+refactor(geometry): single feet↔pixel mapping shared by renderer and click detection for pixel-perfect hit areas
+feat(admin): records-by-account panel with per-account batched delete, admin-only via Firestore rules
+docs: admin account setup and auth-user deletion instructions
+chore(sw): bump cache to pasat-g-v4
+```

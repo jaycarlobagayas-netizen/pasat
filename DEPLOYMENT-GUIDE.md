@@ -39,6 +39,16 @@ Your data is now protected even if someone reads your website's source code.
 
 If you ever see "⚠️ Cloud access denied", it means Part 1 step 4 wasn't published — redo it.
 
+## Your admin account (and removing unintended users)
+
+The admin identity is the email **jaycarlobagayas@gmail.com** — it is wired into both `config.js` (`ADMIN_EMAIL`) and the database rules (`firestore.rules`). There is no separate password to hand you: you create the account yourself, so only you ever know the password.
+
+1. Open the app, tap **Create one**, and sign up with `jaycarlobagayas@gmail.com` and a password you choose (do this before anyone else can — the email is what grants the powers).
+2. Signed in as that account you get: the **Clear All** button (wipes everything), and an **Admin · Records by account** panel under Results — it lists every account that has saved records, with a "Delete records" button per account. Use it to remove an unintended user's data. The database itself enforces this: no other account can delete anything, even with technical tricks.
+3. To delete an unintended user's **login account** as well (so they can't sign in again): go to https://console.firebase.google.com → project **pasatg-75b45** → **Build → Authentication → Users**, find the email, click the **⋮** menu on its row → **Delete account**. Free, immediate, and they'd need to re-register to get back in.
+
+If you ever change the admin email, change it in BOTH `config.js` and `firestore.rules`, then redeploy the site and re-publish the rules.
+
 ## Everyday things
 
 - **Change a setting** (admin email, analytics, etc.): edit `config.js` and redeploy (Option A: drag the folder again).

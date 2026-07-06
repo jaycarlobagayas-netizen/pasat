@@ -6,7 +6,7 @@
    - Static assets (icons, logo, CDN fonts/css): CACHE FIRST, they are
      immutable and versioned by the cache name below.
    Bump CACHE_NAME whenever assets change. */
-const CACHE_NAME = "pasat-g-v2";
+const CACHE_NAME = "pasat-g-v4";
 const PRECACHE = [
   "./",
   "./index.html",

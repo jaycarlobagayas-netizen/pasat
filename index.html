@@ -211,6 +211,18 @@ body::before{
 
 /* ── HEATMAP ── */
 .heatmap-section{margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border2);}
+.trial-row.active-court{background:rgba(0,255,178,0.06);box-shadow:inset 3px 0 0 var(--accent);border-radius:4px;}
+.trial-row .t-num{cursor:pointer;}
+#court-svg{cursor:crosshair;touch-action:manipulation;max-width:100%;}
+.atc-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0 8px;}
+.atc-chip{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;color:var(--accent);background:rgba(0,255,178,0.08);border:1px solid rgba(0,255,178,0.35);border-radius:20px;padding:6px 14px;letter-spacing:0.05em;}
+.btn-mini{font-size:11px;font-weight:600;padding:6px 12px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:inherit;}
+.btn-mini:hover{border-color:var(--accent);color:var(--accent);}
+.btn-mini.out{border-color:rgba(255,77,109,0.5);color:#ff4d6d;}
+.btn-mini.out:hover{border-color:#ff4d6d;color:#ff4d6d;background:rgba(255,77,109,0.08);}
+.tap-feedback{min-height:16px;font-size:11px;color:var(--text2);margin-bottom:8px;font-family:ui-monospace,monospace;}
+.tap-feedback.show{animation:tfpop .35s ease;}
+@keyframes tfpop{0%{transform:scale(0.97);opacity:0.4;}100%{transform:scale(1);opacity:1;}}
 .filter-btns{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
 .filter-btn{
   font-size:11px;padding:5px 14px;border-radius:20px;
@@ -411,7 +423,27 @@ tr.clickable:hover td{background:var(--glass2);}
 
   <div class="card">
     <div class="card-title">Score Entry &nbsp;·&nbsp; 3 Sets &times; 10 Trials</div>
-    <p style="font-size:11px;color:var(--text3);margin-bottom:14px;letter-spacing:0.02em;">Tap a zone for each trial &nbsp;·&nbsp; FH = Forehand &nbsp; BH = Backhand &nbsp;|&nbsp; DCZ=4 &nbsp; DMZ=3 &nbsp; CMZ=2 &nbsp; KAZ=1 &nbsp; Out/Net=0</p>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:14px;letter-spacing:0.02em;">Tap the landing spot on the court below — or use the 0–4 buttons per trial &nbsp;·&nbsp; FH = Forehand &nbsp; BH = Backhand &nbsp;|&nbsp; DCZ=4 &nbsp; DMZ/LMZ/RMZ=3 &nbsp; CMZ/KAZ-L/KAZ-R=2 &nbsp; KAZ-M=1 &nbsp; Out/Net=0</p>
+    <div class="heatmap-section" style="margin:0 0 18px;padding-top:0;border-top:none;">
+      <div class="card-title" style="margin-bottom:6px;">Interactive Court &nbsp;·&nbsp; Tap Where the Ball Landed</div>
+      <p style="font-size:11px;color:var(--text3);margin-bottom:10px;letter-spacing:0.02em;">Exact PASAT-G plan-view model — Kitchen 7 ft · Middle 10 ft · Deep 5 ft, slanted lateral dividers x = 5 − y/22 and x = 15 + y/22 (corridor 10 ft at the net → 12 ft at the baseline). The same equations drive the drawing and the click detection, so taps near a boundary land in the correct zone. Net, serving half, and outside the lines = 0.</p>
+      <div class="atc-bar">
+        <div class="atc-chip" id="atc-chip">—</div>
+        <button class="btn-mini out" onclick="scoreActiveOut()">OUT / NET · 0</button>
+        <button class="btn-mini" onclick="undoLast()"><i class="ti ti-arrow-back-up" style="margin-right:3px"></i>Undo</button>
+      </div>
+      <div class="tap-feedback" id="tap-feedback"></div>
+      <div class="filter-btns">
+        <button class="filter-btn active" id="fb-all" onclick="setFilter('all')">All Shots</button>
+        <button class="filter-btn" id="fb-fh" onclick="setFilter('fh')">Forehand</button>
+        <button class="filter-btn" id="fb-bh" onclick="setFilter('bh')">Backhand</button>
+      </div>
+      <div class="heatmap-wrap">
+        <div style="flex:2 1 380px;min-width:280px;"><svg id="court-svg" viewBox="0 0 640 352" style="display:block;width:100%;max-width:640px;" aria-label="Interactive PASAT-G nine-zone court — tap to score"></svg></div>
+        <div class="heatmap-legend" id="heatmap-legend"></div>
+      </div>
+    </div>
+
     <div id="trials-container"></div>
 
     <hr class="section-sep"/>
@@ -435,19 +467,6 @@ tr.clickable:hover td{background:var(--glass2);}
       </div>
     </div>
 
-    <div class="heatmap-section">
-      <div class="card-title" style="margin-bottom:10px;">Live Court Heatmap</div>
-      <div class="filter-btns">
-        <button class="filter-btn active" id="fb-all" onclick="setFilter('all')">All Shots</button>
-        <button class="filter-btn" id="fb-fh" onclick="setFilter('fh')">Forehand</button>
-        <button class="filter-btn" id="fb-bh" onclick="setFilter('bh')">Backhand</button>
-      </div>
-      <div class="heatmap-wrap">
-        <div><svg id="court-svg" viewBox="0 0 300 470" width="230" style="display:block;" aria-label="PASAT-G court zone heatmap"></svg></div>
-        <div class="heatmap-legend" id="heatmap-legend"></div>
-      </div>
-    </div>
-
     <div class="action-row">
       <button class="btn-save" onclick="saveEntry()"><i class="ti ti-device-floppy" style="margin-right:6px"></i>SAVE PARTICIPANT</button>
       <button class="btn-clear" onclick="resetForm()"><i class="ti ti-refresh"></i></button>
@@ -463,6 +482,7 @@ tr.clickable:hover td{background:var(--glass2);}
       </div>
     </div>
     <div class="res-wrap"><div id="results-body"></div></div>
+    <div id="admin-panel" style="display:none;"></div>
   </div>
 
   <div class="card" id="analytics-card" style="display:none;">
@@ -494,9 +514,16 @@ tr.clickable:hover td{background:var(--glass2);}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="./config.js"></script>
 <script>
-const ZONES=[{label:'DCZ',score:4},{label:'DMZ',score:3},{label:'CMZ',score:2},{label:'KAZ',score:1},{label:'OUT/NET',score:0}];
+const ZONES=[
+  {label:'4',score:4,hint:'DCZ — deep corners'},
+  {label:'3',score:3,hint:'DMZ · LMZ · RMZ'},
+  {label:'2',score:2,hint:'CMZ · KAZ-L · KAZ-R'},
+  {label:'1',score:1,hint:'KAZ-M — kitchen middle'},
+  {label:'OUT',score:0,hint:'Out / Net'}
+];
 const TOTAL=30;
 let scores=Array(TOTAL).fill(null),hand=null,entries=[],currentFilter='all';
+let zones=Array(TOTAL).fill(null),pts=Array(TOTAL).fill(null),tapLog=[],activeTrial=0;
 
 
 
@@ -676,12 +703,51 @@ async function persistEntry(entry){
 
 
 const ZONE_META={
-  4:{fill:'#00FFB2',stroke:'#00c8a0',name:'Deep corner zone',abbr:'DCZ',pts:'4 pts'},
-  3:{fill:'#9b6dd1',stroke:'#7a48ad',name:'Deep middle zone',abbr:'DMZ',pts:'3 pts'},
-  2:{fill:'#00c8ff',stroke:'#0099cc',name:'Center middle zone',abbr:'CMZ',pts:'2 pts'},
-  1:{fill:'#50c850',stroke:'#3a9440',name:'Kitchen zone',abbr:'KAZ',pts:'1 pt'},
+  4:{fill:'#00FFB2',stroke:'#00c8a0',name:'Deep corners ×2 (DCZ)',abbr:'DCZ',pts:'4 pts'},
+  3:{fill:'#9b6dd1',stroke:'#7a48ad',name:'DMZ · LMZ · RMZ',abbr:'Z3',pts:'3 pts'},
+  2:{fill:'#00c8ff',stroke:'#0099cc',name:'CMZ · KAZ-L · KAZ-R',abbr:'Z2',pts:'2 pts'},
+  1:{fill:'#50c850',stroke:'#3a9440',name:'Kitchen middle',abbr:'KAZ-M',pts:'1 pt'},
   0:{fill:'#ff4d6d',stroke:'#cc2244',name:'Out / Net',abbr:'OUT',pts:'0 pts'}
 };
+
+/* ---- PASAT-G nine-zone court geometry (v2 model) ----
+   Feet coordinates: x = width 0–20 (left sideline → right),
+   d = depth from the net 0–22. Slanted lateral dividers:
+   left x = 5 − d/22 · right x = 15 + d/22
+   (center corridor 10 ft at the net → 12 ft at the baseline). */
+/* Plan-view canvas: 12 px per foot. Court origin (40,60); full court
+   44 ft × 20 ft = 528 × 240 px; net at x = 40 + 22 ft = 304.
+   The SAME functions map feet→pixels for rendering and pixels→feet
+   for click detection, so hit areas align exactly with the drawing. */
+const FT=12, CTX=40, CTY=60;
+const NETX=CTX+22*FT, CTB=CTY+20*FT, CRX=CTX+44*FT;   // 304 · 300 · 568
+const PLAN={bgOut:'#5b8271',court:'#3e5878',kitchen:'#4d6787',line:'#ffffff',text:'#14304d',
+  score:{4:'#2d68b2',3:'#5fbab0',2:'#b7dfbc',1:'#f2eecb',0:'#3e5878'},fh:'#ff6b1a',bh:'#7d3cc0'};
+function divL(d){return 5-d/22;}
+function divR(d){return 15+d/22;}
+function zoneAt(x,d){
+  if(d<0||d>22||x<0||x>20)return'OUT';
+  const L=divL(d),R=divR(d);
+  if(d<7)return x<L?'KAZ-L':(x>R?'KAZ-R':'KAZ-M');
+  if(d<17)return x<L?'LMZ':(x>R?'RMZ':'CMZ');
+  return(x<L||x>R)?'DCZ':'DMZ';
+}
+const ZONE_SCORE={'DCZ':4,'DMZ':3,'LMZ':3,'RMZ':3,'CMZ':2,'KAZ-L':2,'KAZ-R':2,'KAZ-M':1,'OUT':0};
+const CANON_ZONE={4:'DCZ',3:'DMZ',2:'CMZ',1:'KAZ-M',0:'OUT'};
+const ZONE_POLY=[
+  {z:'KAZ-L',poly:[[0,0],[5,0],[4.682,7],[0,7]],lab:[2.4,3.5]},
+  {z:'KAZ-M',poly:[[5,0],[15,0],[15.318,7],[4.682,7]],lab:[10,3.5]},
+  {z:'KAZ-R',poly:[[15,0],[20,0],[20,7],[15.318,7]],lab:[17.6,3.5]},
+  {z:'LMZ',poly:[[0,7],[4.682,7],[4.227,17],[0,17]],lab:[2.3,12]},
+  {z:'CMZ',poly:[[4.682,7],[15.318,7],[15.773,17],[4.227,17]],lab:[10,12]},
+  {z:'RMZ',poly:[[15.318,7],[20,7],[20,17],[15.773,17]],lab:[17.7,12]},
+  {z:'DCZ',poly:[[0,17],[4.227,17],[4,22],[0,22]],lab:[2,19.5]},
+  {z:'DMZ',poly:[[4.227,17],[15.773,17],[16,22],[4,22]],lab:[10,19.5]},
+  {z:'DCZ',poly:[[15.773,17],[20,17],[20,22],[16,22]],lab:[18,19.5]}
+];
+function _pd(d){return NETX+d*FT;}          // depth from net → x px
+function _pw(w){return CTB-w*FT;}           // width (0 = KAZ-L sideline) → y px
+function _poly(p){return p.map(q=>_pd(q[1]).toFixed(1)+','+_pw(q[0]).toFixed(1)).join(' ');}
 
 function setHand(h){hand=h;document.getElementById('hand-r').classList.toggle('active',h==='R');document.getElementById('hand-l').classList.toggle('active',h==='L');}
 function trialStroke(i){return(i%10)<5?'FH':'BH';}
@@ -697,19 +763,93 @@ function buildTrials(){
       const idx=s*10+t;
       if(t===5){const dv=document.createElement('div');dv.className='set-divider';dv.innerHTML=`<div class="div-line"></div><span class="div-lbl">backhand</span><div class="div-line"></div>`;sd.appendChild(dv);}
       const stroke=trialStroke(idx);
-      const row=document.createElement('div');row.className='trial-row';
-      row.innerHTML=`<div class="t-num">${idx+1}</div><div class="stroke-tag ${stroke==='FH'?'fh-tag':'bh-tag'}">${stroke}</div><div class="zone-btns" id="zb-${idx}">${ZONES.map(z=>`<button class="zone-btn" onclick="setZone(${idx},${z.score})" data-score="${z.score}">${z.label}</button>`).join('')}</div><div class="sc-disp empty" id="sd-${idx}">—</div>`;
+      const row=document.createElement('div');row.className='trial-row';row.id=`tr-${idx}`;
+      row.innerHTML=`<div class="t-num" onclick="selectTrial(${idx})" title="Tap to score this trial on the court">${idx+1}</div><div class="stroke-tag ${stroke==='FH'?'fh-tag':'bh-tag'}">${stroke}</div><div class="zone-btns" id="zb-${idx}">${ZONES.map(z=>`<button class="zone-btn" onclick="setZone(${idx},${z.score})" data-score="${z.score}" title="${z.hint}">${z.label}</button>`).join('')}</div><div class="sc-disp empty" id="sd-${idx}">—</div>`;
       sd.appendChild(row);
     }
     c.appendChild(sd);
   }
 }
 
-function setZone(idx,score){
+function setZone(idx,score,fromCourt){
   scores[idx]=score;
+  if(!fromCourt){zones[idx]=CANON_ZONE[score];pts[idx]=null;}
+  tapLog.push(idx);
   document.getElementById(`zb-${idx}`).querySelectorAll('.zone-btn').forEach(b=>{b.className='zone-btn';if(parseInt(b.dataset.score)===score)b.classList.add(`sel-${score}`); });
-  const sd=document.getElementById(`sd-${idx}`);sd.textContent=score;sd.className='sc-disp';
-  updateSummary();drawCourt();
+  const sd=document.getElementById(`sd-${idx}`);sd.textContent=score;sd.className='sc-disp';sd.title=zones[idx]||'';
+  feedback(`Trial ${idx+1} → ${zones[idx]} · ${score} pt${score===1?'':'s'}`);
+  activeTrial=nextUnscored(idx+1);
+  highlightActive();updateSummary();drawCourt();
+}
+
+function nextUnscored(from){
+  for(let k=0;k<TOTAL;k++){const i=(((from||0)%TOTAL)+k)%TOTAL;if(scores[i]===null)return i;}
+  return null;
+}
+function selectTrial(i){
+  activeTrial=i;highlightActive();updateActiveBar();
+  feedback(`Trial ${i+1} selected — tap the court to score it.`);
+}
+function highlightActive(){
+  document.querySelectorAll('.trial-row').forEach(r=>r.classList.remove('active-court'));
+  if(activeTrial!==null){const r=document.getElementById('tr-'+activeTrial);if(r)r.classList.add('active-court');}
+}
+function updateActiveBar(){
+  const chip=document.getElementById('atc-chip');if(!chip)return;
+  if(activeTrial===null){chip.innerHTML='All 30 trials scored ✓ — review, then SAVE PARTICIPANT';return;}
+  chip.innerHTML=`Now scoring — Trial ${activeTrial+1} · SET ${Math.floor(activeTrial/10)+1} · ${trialStroke(activeTrial)}`;
+}
+function feedback(msg){
+  const el=document.getElementById('tap-feedback');if(!el)return;
+  el.textContent=msg;el.classList.remove('show');void el.offsetWidth;el.classList.add('show');
+}
+function scoreActiveOut(){
+  if(activeTrial===null)activeTrial=nextUnscored(0);
+  if(activeTrial===null){feedback('All 30 trials are scored — Undo or tap a trial number to change one.');return;}
+  zones[activeTrial]='OUT';pts[activeTrial]=null;
+  setZone(activeTrial,0,true);
+}
+function undoLast(){
+  while(tapLog.length){
+    const idx=tapLog.pop();
+    if(scores[idx]!==null){
+      scores[idx]=null;zones[idx]=null;pts[idx]=null;
+      const zb=document.getElementById(`zb-${idx}`);if(zb)zb.querySelectorAll('.zone-btn').forEach(b=>b.className='zone-btn');
+      const sd=document.getElementById(`sd-${idx}`);if(sd){sd.textContent='—';sd.className='sc-disp empty';sd.title='';}
+      activeTrial=idx;highlightActive();updateSummary();drawCourt();
+      feedback(`Trial ${idx+1} cleared — tap the court to re-score it.`);
+      return;
+    }
+  }
+  feedback('Nothing to undo.');
+}
+function initCourtInput(){
+  const svg=document.getElementById('court-svg');if(!svg)return;
+  svg.addEventListener('click',ev=>{
+    const r=svg.getBoundingClientRect();if(!r.width||!r.height)return;
+    const vx=(ev.clientX-r.left)*640/r.width;
+    const vy=(ev.clientY-r.top)*352/r.height;
+    if(activeTrial===null)activeTrial=nextUnscored(0);
+    if(activeTrial===null){feedback('All 30 trials are scored — Undo or tap a trial number to change one.');return;}
+    const d=(vx-NETX)/FT, x=(CTB-vy)/FT;   // inverse of _pd/_pw — identical geometry as the drawing
+    const z=zoneAt(x,d);
+    zones[activeTrial]=z;
+    pts[activeTrial]={x:Math.round(x*10)/10,d:Math.round(d*10)/10};
+    setZone(activeTrial,ZONE_SCORE[z],true);
+  });
+  highlightActive();updateActiveBar();
+  feedback('Tap the court to score Trial 1.');
+}
+function getZoneCounts(filter){
+  const c={};Object.keys(ZONE_SCORE).forEach(k=>c[k]=0);
+  for(let i=0;i<TOTAL;i++){
+    if(scores[i]===null)continue;
+    const st=trialStroke(i);
+    if(filter==='fh'&&st!=='FH')continue;
+    if(filter==='bh'&&st!=='BH')continue;
+    c[zones[i]||CANON_ZONE[scores[i]]]++;
+  }
+  return c;
 }
 
 function setFilter(f){currentFilter=f;['all','fh','bh'].forEach(x=>document.getElementById('fb-'+x).classList.toggle('active',x===f));drawCourt();}
@@ -723,69 +863,93 @@ function getCounts(filter){
 function hexToRgba(hex,a){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`rgba(${r},${g},${b},${a})`;}
 
 function drawCourt(){
-  const svg=document.getElementById('court-svg');
+  const svg=document.getElementById('court-svg');if(!svg)return;
   const counts=getCounts(currentFilter);
+  const zc=getZoneCounts(currentFilter);
   const total=Object.values(counts).reduce((a,b)=>a+b,0);
-  function op(score){if(total===0)return 0.25;const r=counts[score]/total;return counts[score]===0?0.08:0.18+r*0.75;}
-
-  const cL=30,cR=270,cW=240,cx=150;
-  const baselineY=30,deepLineY=74,kitchenBotY=148,netY=250,playerBot=450;
-  const dczW=60;
+  const MIDY=CTY+10*FT, KSRV=NETX-7*FT;   // court mid line y=180 · serving-side kitchen line x=220
 
   let s='';
-  s+=`<rect x="0" y="0" width="300" height="470" fill="#040d12"/>`;
-  s+=`<rect x="${cL}" y="${baselineY}" width="${cW}" height="${netY-baselineY}" fill="#071520" rx="2"/>`;
-  s+=`<rect x="${cL}" y="${kitchenBotY}" width="${cW}" height="${netY-kitchenBotY}" fill="${hexToRgba(ZONE_META[1].fill,op(1))}" stroke="${ZONE_META[1].stroke}" stroke-width="1.2"/>`;
-  s+=`<rect x="${cL}" y="${deepLineY}" width="${cW}" height="${kitchenBotY-deepLineY}" fill="${hexToRgba(ZONE_META[2].fill,op(2))}" stroke="${ZONE_META[2].stroke}" stroke-width="1.2"/>`;
-  s+=`<rect x="${cL}" y="${baselineY}" width="${dczW}" height="${deepLineY-baselineY}" fill="${hexToRgba(ZONE_META[4].fill,op(4))}" stroke="${ZONE_META[4].stroke}" stroke-width="1.2"/>`;
-  s+=`<rect x="${cR-dczW}" y="${baselineY}" width="${dczW}" height="${deepLineY-baselineY}" fill="${hexToRgba(ZONE_META[4].fill,op(4))}" stroke="${ZONE_META[4].stroke}" stroke-width="1.2"/>`;
-  s+=`<rect x="${cL+dczW}" y="${baselineY}" width="${cW-2*dczW}" height="${deepLineY-baselineY}" fill="${hexToRgba(ZONE_META[3].fill,op(3))}" stroke="${ZONE_META[3].stroke}" stroke-width="1.2"/>`;
+  s+=`<defs><marker id="arrh" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#e05555"/></marker></defs>`;
 
-  s+=`<line x1="${cL}" y1="${baselineY}" x2="${cR}" y2="${baselineY}" stroke="rgba(0,255,178,0.8)" stroke-width="2"/>`;
-  s+=`<line x1="${cL}" y1="${deepLineY}" x2="${cR}" y2="${deepLineY}" stroke="rgba(0,255,178,0.5)" stroke-width="1.2"/>`;
-  s+=`<line x1="${cL}" y1="${kitchenBotY}" x2="${cR}" y2="${kitchenBotY}" stroke="rgba(0,255,178,0.4)" stroke-width="1"/>`;
-  s+=`<line x1="${cL}" y1="${netY}" x2="${cR}" y2="${netY}" stroke="rgba(0,255,178,0.7)" stroke-width="2" stroke-dasharray="6,4"/>`;
-  s+=`<line x1="${cx}" y1="${baselineY}" x2="${cx}" y2="${netY}" stroke="rgba(0,255,178,0.15)" stroke-width="1"/>`;
-  s+=`<line x1="${cL+dczW}" y1="${baselineY}" x2="${cL+dczW}" y2="${deepLineY}" stroke="rgba(0,255,178,0.4)" stroke-width="1"/>`;
-  s+=`<line x1="${cR-dczW}" y1="${baselineY}" x2="${cR-dczW}" y2="${deepLineY}" stroke="rgba(0,255,178,0.4)" stroke-width="1"/>`;
+  // surround (grass)
+  s+=`<rect x="0" y="0" width="640" height="352" fill="${PLAN.bgOut}" rx="8"/>`;
 
-  s+=`<rect x="${cL-8}" y="${netY-4}" width="${cW+16}" height="8" fill="#1a3a4a" rx="2" stroke="rgba(0,200,255,0.4)" stroke-width="1"/>`;
-  s+=`<text x="${cx}" y="${netY+2}" text-anchor="middle" font-size="7" font-weight="700" fill="rgba(0,200,255,0.9)" font-family="monospace">NET</text>`;
+  // depth-band labels (top)
+  s+=`<text x="${_pd(3.5)}" y="48" text-anchor="middle" font-size="10" font-weight="600" fill="#eaf2ec">Kitchen 7 ft</text>`;
+  s+=`<text x="${_pd(12)}" y="48" text-anchor="middle" font-size="10" font-weight="600" fill="#eaf2ec">Middle 10 ft</text>`;
+  s+=`<text x="${_pd(19.5)}" y="48" text-anchor="middle" font-size="10" font-weight="600" fill="#eaf2ec">Deep 5 ft</text>`;
+  s+=`<text x="${NETX}" y="34" text-anchor="middle" font-size="10" font-weight="700" fill="#14304d">NET</text>`;
 
-  s+=`<rect x="${cL}" y="${netY+8}" width="${cW}" height="${playerBot-netY-8}" fill="#071a10" rx="0"/>`;
-  s+=`<line x1="${cx}" y1="${netY+8}" x2="${cx}" y2="${playerBot}" stroke="rgba(0,255,178,0.12)" stroke-width="1"/>`;
-  s+=`<ellipse cx="${cx}" cy="${netY+28}" rx="40" ry="14" fill="none" stroke="rgba(0,255,178,0.5)" stroke-width="1.5" stroke-dasharray="4,3"/>`;
-  s+=`<text x="${cx}" y="${netY+31}" text-anchor="middle" font-size="8" font-weight="600" fill="rgba(0,255,178,0.8)" font-family="monospace">Drop zone</text>`;
-  s+=`<circle cx="${cx}" cy="${playerBot-48}" r="14" fill="#0a2050" stroke="rgba(0,200,255,0.8)" stroke-width="2"/>`;
-  s+=`<text x="${cx}" y="${playerBot-43}" text-anchor="middle" font-size="11" font-weight="700" fill="#00c8ff" font-family="monospace">P</text>`;
-  s+=`<text x="${cx}" y="${playerBot-27}" text-anchor="middle" font-size="7" fill="rgba(0,200,255,0.6)" font-family="monospace">PLAYER</text>`;
-  s+=`<rect x="${cL}" y="${baselineY}" width="${cW}" height="${playerBot-baselineY}" fill="none" stroke="rgba(0,255,178,0.4)" stroke-width="1.5" rx="2"/>`;
+  // court base — serving half
+  s+=`<rect x="${CTX}" y="${CTY}" width="${44*FT}" height="${20*FT}" fill="${PLAN.court}"/>`;
+  s+=`<rect x="${KSRV}" y="${CTY}" width="${7*FT}" height="${20*FT}" fill="${PLAN.kitchen}"/>`;
+  s+=`<line x1="${CTX}" y1="${MIDY}" x2="${KSRV}" y2="${MIDY}" stroke="${PLAN.line}" stroke-width="2"/>`;
+  s+=`<line x1="${KSRV}" y1="${CTY}" x2="${KSRV}" y2="${CTB}" stroke="${PLAN.line}" stroke-width="2"/>`;
+  s+=`<text x="${(CTX+KSRV)/2}" y="${CTY+5*FT}" text-anchor="middle" font-size="11" fill="#dbe6f2">Right service</text>`;
+  s+=`<text x="${(CTX+KSRV)/2}" y="${CTB-5*FT+4}" text-anchor="middle" font-size="11" fill="#dbe6f2">Left service</text>`;
 
-  s+=`<text x="${cx}" y="${baselineY-10}" text-anchor="middle" font-size="8" fill="rgba(0,255,178,0.5)" font-family="monospace">BASELINE</text>`;
-  s+=`<text x="${cx}" y="${playerBot+16}" text-anchor="middle" font-size="7" fill="rgba(0,200,255,0.4)" font-family="monospace">&#x2190; PLAYER SIDE &#x2192;</text>`;
+  // nine scoring zones — reference palette, exact slanted dividers
+  ZONE_POLY.forEach(zp=>{
+    s+=`<polygon points="${_poly(zp.poly)}" fill="${PLAN.score[ZONE_SCORE[zp.z]]}" stroke="${PLAN.line}" stroke-width="2"/>`;
+  });
 
-  function zlabel(score,x,y){
-    const cnt=counts[score],pct=total>0?Math.round(cnt/total*100):0;
-    const col=ZONE_META[score].fill;
-    s+=`<text x="${x}" y="${y}" text-anchor="middle" font-size="9" font-weight="700" fill="${col}" font-family="monospace">${ZONE_META[score].abbr}</text>`;
-    s+=`<text x="${x}" y="${y+13}" text-anchor="middle" font-size="11" font-weight="700" fill="${col}" font-family="monospace">${cnt}</text>`;
-    s+=`<text x="${x}" y="${y+24}" text-anchor="middle" font-size="8" fill="${col}" opacity="0.7" font-family="monospace">${pct}%</text>`;
+  // court outer boundary
+  s+=`<rect x="${CTX}" y="${CTY}" width="${44*FT}" height="${20*FT}" fill="none" stroke="${PLAN.line}" stroke-width="3"/>`;
+
+  // net (dashed vertical, end posts)
+  s+=`<line x1="${NETX}" y1="${CTY-6}" x2="${NETX}" y2="${CTB+6}" stroke="#14304d" stroke-width="3" stroke-dasharray="2,6" stroke-linecap="round"/>`;
+  s+=`<circle cx="${NETX}" cy="${CTY-6}" r="3.5" fill="#14304d"/><circle cx="${NETX}" cy="${CTB+6}" r="3.5" fill="#14304d"/>`;
+
+  // feeder + player + feed arrows (as in the reference)
+  const PX=CTX+9*FT, FX=NETX-22, CYm=MIDY;
+  s+=`<path d="M ${FX-16} ${CYm-6} Q ${(FX+PX)/2} ${CYm-56} ${PX+30} ${CYm-10}" fill="none" stroke="#e05555" stroke-width="1.6" stroke-dasharray="5,4" marker-end="url(#arrh)"/>`;
+  s+=`<path d="M ${FX-16} ${CYm} L ${PX+32} ${CYm}" fill="none" stroke="#e05555" stroke-width="1.6" stroke-dasharray="5,4" marker-end="url(#arrh)"/>`;
+  s+=`<path d="M ${FX-16} ${CYm+6} Q ${(FX+PX)/2} ${CYm+56} ${PX+30} ${CYm+10}" fill="none" stroke="#e05555" stroke-width="1.6" stroke-dasharray="5,4" marker-end="url(#arrh)"/>`;
+  s+=`<text x="${(PX+FX)/2}" y="${CYm-16}" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" letter-spacing="1">SERVING HALF</text>`;
+  s+=`<ellipse cx="${PX}" cy="${CYm}" rx="26" ry="16" fill="#33451d" stroke="${PLAN.line}" stroke-width="2"/>`;
+  s+=`<text x="${PX}" y="${CYm+3}" text-anchor="middle" font-size="8.5" font-weight="700" fill="#fff">Player</text>`;
+  s+=`<circle cx="${FX}" cy="${CYm}" r="16" fill="#f59e0b" stroke="${PLAN.line}" stroke-width="2"/>`;
+  s+=`<text x="${FX}" y="${CYm+3}" text-anchor="middle" font-size="7.5" font-weight="700" fill="#fff">Feeder</text>`;
+
+  // zone labels: score number + zone code + live count (white halo like the reference)
+  const HALO='paint-order="stroke" stroke="#ffffff" stroke-width="2.4" stroke-linejoin="round"';
+  ZONE_POLY.forEach(zp=>{
+    const x=_pd(zp.lab[1]), y=_pw(zp.lab[0]);
+    const cnt=zc[zp.z];
+    s+=`<text x="${x}" y="${y-2}" text-anchor="middle" font-size="19" font-weight="800" fill="${PLAN.text}" ${HALO} font-family="Inter,sans-serif">${ZONE_SCORE[zp.z]}</text>`;
+    s+=`<text x="${x}" y="${y+12}" text-anchor="middle" font-size="9.5" font-weight="800" fill="${PLAN.text}" ${HALO} font-family="Inter,sans-serif">${zp.z}</text>`;
+    if(cnt>0)s+=`<text x="${x}" y="${y+24}" text-anchor="middle" font-size="8.5" font-weight="700" fill="#7a2c0e" ${HALO}>n=${cnt}</text>`;
+  });
+
+  // landing dots (numbered · FH orange · BH purple)
+  for(let i=0;i<TOTAL;i++){
+    const p=pts[i];if(!p)continue;
+    const st=trialStroke(i);
+    if(currentFilter==='fh'&&st!=='FH')continue;
+    if(currentFilter==='bh'&&st!=='BH')continue;
+    const col=st==='FH'?PLAN.fh:PLAN.bh;
+    s+=`<circle cx="${_pd(p.d).toFixed(1)}" cy="${_pw(p.x).toFixed(1)}" r="7" fill="${col}" stroke="#ffffff" stroke-width="1.6"/>`;
+    s+=`<text x="${_pd(p.d).toFixed(1)}" y="${(_pw(p.x)+2.6).toFixed(1)}" text-anchor="middle" font-size="7.5" font-weight="700" fill="#ffffff">${i+1}</text>`;
   }
-  zlabel(4,cL+dczW/2,baselineY+16);
-  zlabel(4,cR-dczW/2,baselineY+16);
-  zlabel(3,cx,baselineY+15);
-  zlabel(2,cx,(deepLineY+kitchenBotY)/2-8);
-  zlabel(1,cx,(kitchenBotY+netY)/2-8);
+
+  // bottom captions
+  s+=`<text x="${(CTX+NETX)/2}" y="330" text-anchor="middle" font-size="9.5" fill="#eaf2ec">Serving half · net · outside lines = 0 pts</text>`;
+  s+=`<text x="${_pd(11)}" y="330" text-anchor="middle" font-size="9.5" fill="#eaf2ec">&#x2190; Scoring half 22 ft &#x2192; &#160; tap the landing spot</text>`;
 
   svg.innerHTML=s;
+  updateActiveBar();
 
+  // legend — mirrors the reference legend, with live counts
   const leg=document.getElementById('heatmap-legend');
-  let lh=`<div style="font-size:9px;color:var(--text3);font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.1em;font-family:'Orbitron',sans-serif;">Zone Data</div>`;
-  [4,3,2,1,0].forEach(sc=>{
-    const m=ZONE_META[sc],cnt=counts[sc],pct=total>0?Math.round(cnt/total*100):0;
-    lh+=`<div class="leg-item"><div class="swatch" style="background:${m.fill}22;border:1px solid ${m.fill}88;box-shadow:0 0 6px ${m.fill}44;"></div><div><div style="font-size:12px;font-weight:700;color:${m.fill};font-family:'Orbitron',sans-serif;">${m.abbr} <span style="font-size:10px;color:var(--text3);font-family:'Inter',sans-serif;font-weight:400;">${m.pts}</span></div><div style="font-size:10px;color:var(--text3);margin-top:1px;">${m.name}</div></div><div style="margin-left:auto;text-align:right;"><div style="font-size:15px;font-weight:700;color:${m.fill};font-family:'Orbitron',sans-serif;">${cnt}</div><div style="font-size:10px;color:var(--text3);">${pct}%</div></div></div>`;
+  const LEGZ=[[4,'DCZ — Deep Corner (both)'],[3,'DMZ · LMZ · RMZ'],[2,'CMZ · KAZ-L · KAZ-R'],[1,'KAZ-M — Kitchen middle'],[0,'Serving half · Out / Net']];
+  let lh=`<div style="font-size:9px;color:var(--text3);font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.1em;font-family:'Orbitron',sans-serif;">Score per trial by landing zone</div>`;
+  LEGZ.forEach(([sc,name])=>{
+    const cnt=counts[sc],pct=total>0?Math.round(cnt/total*100):0;
+    lh+=`<div class="leg-item"><div class="swatch" style="background:${PLAN.score[sc]};border:1px solid rgba(255,255,255,0.5);"></div><div><div style="font-size:13px;font-weight:700;color:var(--text);font-family:'Orbitron',sans-serif;">${sc} <span style="font-size:10px;color:var(--text3);font-family:'Inter',sans-serif;font-weight:400;">pts</span></div><div style="font-size:10px;color:var(--text3);margin-top:1px;">${name}</div></div><div style="margin-left:auto;text-align:right;"><div style="font-size:15px;font-weight:700;color:var(--text2);font-family:'Orbitron',sans-serif;">${cnt}</div><div style="font-size:10px;color:var(--text3);">${pct}%</div></div></div>`;
   });
-  lh+=total>0?`<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border2);font-size:10px;color:var(--text3);">${total} / 30 trials</div>`:`<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border2);font-size:10px;color:var(--text3);font-style:italic;">No scores yet</div>`;
+  lh+=`<div style="margin-top:8px;font-size:10px;color:var(--text3);"><span style="color:${PLAN.fh};">&#9679;</span> FH landing &nbsp; <span style="color:${PLAN.bh};">&#9679;</span> BH landing — numbers = trial</div>`;
+  lh+=total>0?`<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border2);font-size:10px;color:var(--text3);">${total} / 30 trials</div>`:`<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border2);font-size:10px;color:var(--text3);font-style:italic;">No scores yet — tap the court</div>`;
   leg.innerHTML=lh;
 }
 
@@ -924,7 +1088,7 @@ async function saveEntry(){
   const bhS=[0,1,2].map(s=>{let t=0;for(let i=5;i<10;i++){const v=scores[s*10+i];if(v!==null)t+=v;}return t;});
   const setTots=[0,1,2].map(s=>setScores(s).t);
   const fhMean=(fhS[0]+fhS[1]+fhS[2])/3, bhMean=(bhS[0]+bhS[1]+bhS[2])/3;
-  const entry={code,sex:document.getElementById('p-sex').value,age:document.getElementById('p-age').value,exp:document.getElementById('p-exp').value,hand:hand||'—',tester:document.getElementById('p-tester').value,date:document.getElementById('p-date').value,scores:[...scores],setTots,fhMean,bhMean,fhPct:Math.round(fhMean/20*100),bhPct:Math.round(bhMean/20*100),finalScore:(setTots[0]+setTots[1]+setTots[2])/3};
+  const entry={code,sex:document.getElementById('p-sex').value,age:document.getElementById('p-age').value,exp:document.getElementById('p-exp').value,hand:hand||'—',tester:document.getElementById('p-tester').value,date:document.getElementById('p-date').value,scores:[...scores],setTots,fhMean,bhMean,fhPct:Math.round(fhMean/20*100),bhPct:Math.round(bhMean/20*100),finalScore:(setTots[0]+setTots[1]+setTots[2])/3,zones:[...zones],pts:pts.map(p=>p?{x:p.x,d:p.d}:null)};
   await persistEntry(entry);
   resetForm();
 }
@@ -933,7 +1097,10 @@ function resetForm(){
   ['p-code','p-age','p-exp','p-tester'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('p-sex').value='';document.getElementById('p-date').value='';
   hand=null;document.getElementById('hand-r').classList.remove('active');document.getElementById('hand-l').classList.remove('active');
-  scores=Array(TOTAL).fill(null);buildTrials();updateSummary();drawCourt();
+  scores=Array(TOTAL).fill(null);zones=Array(TOTAL).fill(null);pts=Array(TOTAL).fill(null);
+  tapLog=[];activeTrial=0;
+  buildTrials();highlightActive();updateSummary();drawCourt();
+  feedback('Form cleared — tap the court to score Trial 1.');
 }
 
 function pillCls(m){if(m>=34)return'e';if(m>=27)return'vg';if(m>=20)return'a';if(m>=13)return'b';return'p';}
@@ -954,6 +1121,7 @@ function renderResults(){
   html+='</tbody></table><div style="font-size:10px;color:var(--text3);margin-top:10px;text-align:center;">Tap any row to view full participant breakdown</div>';
   document.getElementById('results-body').innerHTML=html;
   renderAnalytics();
+  renderAdminPanel();
 }
 
 function openDetail(id){
@@ -986,11 +1154,30 @@ function openDetail(id){
     </div>
     <div style="margin-bottom:6px;"><span class="pill pill-${pillCls(e.finalScore)}">${oi.label}</span> <span style="font-size:11px;color:var(--text2);margin-left:6px;">${oi.desc}</span></div>
     ${grid}
+    ${miniCourt(e)}
     <div style="display:flex;gap:8px;margin-top:1rem;">
       <button class="btn-exp" style="flex:1" onclick="exportOne('${e.id}')"><i class="ti ti-download" style="margin-right:4px"></i>Export this participant</button>
     </div>`;
   document.getElementById('detail-content').innerHTML=html;
   document.getElementById('detail-modal').classList.add('open');
+}
+function miniCourt(e){
+  if(!e||!e.pts||!e.pts.some(p=>p))return'';
+  let s=`<svg viewBox="290 48 292 264" width="100%" style="max-width:300px;display:block;margin:14px auto 0;border-radius:6px;" aria-label="Shot landing map">`;
+  s+=`<rect x="290" y="48" width="292" height="264" fill="${PLAN.bgOut}"/>`;
+  ZONE_POLY.forEach(zp=>{
+    s+=`<polygon points="${_poly(zp.poly)}" fill="${PLAN.score[ZONE_SCORE[zp.z]]}" stroke="${PLAN.line}" stroke-width="1.6"/>`;
+    s+=`<text x="${_pd(zp.lab[1])}" y="${_pw(zp.lab[0])+3}" text-anchor="middle" font-size="8" font-weight="700" fill="${PLAN.text}" opacity="0.75">${zp.z}</text>`;
+  });
+  s+=`<line x1="${NETX}" y1="${CTY-4}" x2="${NETX}" y2="${CTB+4}" stroke="#14304d" stroke-width="3" stroke-dasharray="2,5" stroke-linecap="round"/>`;
+  e.pts.forEach((p,i)=>{
+    if(!p)return;
+    const col=trialStroke(i)==='FH'?PLAN.fh:PLAN.bh;
+    s+=`<circle cx="${_pd(p.d).toFixed(1)}" cy="${_pw(p.x).toFixed(1)}" r="6" fill="${col}" stroke="#ffffff" stroke-width="1.3"/>`;
+    s+=`<text x="${_pd(p.d).toFixed(1)}" y="${(_pw(p.x)+2.2).toFixed(1)}" text-anchor="middle" font-size="6.5" font-weight="700" fill="#ffffff">${i+1}</text>`;
+  });
+  s+=`</svg><div style="font-size:10px;color:var(--text3);text-align:center;margin-top:4px;">Shot landing map · <span style="color:${PLAN.fh}">&#9679; FH</span> &nbsp; <span style="color:${PLAN.bh}">&#9679; BH</span> · numbers = trial · net at left</div>`;
+  return s;
 }
 function closeDetail(){ document.getElementById('detail-modal').classList.remove('open'); }
 
@@ -999,26 +1186,34 @@ function exportOne(id){
   const oi=oInterp(e.finalScore);
   let csv='Code,Sex,Age,Exp,Hand,Tester,Date,';
   for(let s=1;s<=3;s++)for(let t=1;t<=10;t++)csv+=`S${s}T${t},`;
-  csv+='Set1,Set2,Set3,FH_Mean,BH_Mean,FH_Pct,BH_Pct,PASAT_G,Level\n';
+  csv+='Set1,Set2,Set3,FH_Mean,BH_Mean,FH_Pct,BH_Pct,PASAT_G,Level,';
+  for(let s=1;s<=3;s++)for(let t=1;t<=10;t++)csv+=`Z_S${s}T${t},`;
+  csv+='LandingXY\n';
   csv+=`${e.code},${e.sex},${e.age},${e.exp},${e.hand},${e.tester},${e.date},`;
   e.scores.forEach(v=>csv+=`${v!==null?v:''},`);
   const fhP=(e.fhPct!=null)?e.fhPct:Math.round(e.fhMean/20*100);
   const bhP=(e.bhPct!=null)?e.bhPct:Math.round(e.bhMean/20*100);
-  csv+=`${e.setTots[0]},${e.setTots[1]},${e.setTots[2]},${e.fhMean.toFixed(2)},${e.bhMean.toFixed(2)},${fhP},${bhP},${e.finalScore.toFixed(2)},${oi.label}\n`;
+  csv+=`${e.setTots[0]},${e.setTots[1]},${e.setTots[2]},${e.fhMean.toFixed(2)},${e.bhMean.toFixed(2)},${fhP},${bhP},${e.finalScore.toFixed(2)},${oi.label},`;
+  for(let i=0;i<30;i++)csv+=`${(e.zones&&e.zones[i])||''},`;
+  csv+=`"${(e.pts||[]).map((p,i)=>p?`${i+1}:${p.x}|${p.d}`:'').filter(Boolean).join(' ')}"\n`;
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='PASAT_G_'+e.code.replace(/[^a-z0-9]/gi,'_')+'.csv';a.click();
 }
 
 function exportCSV(){
   let csv='Rank,Code,Sex,Age,Exp,Hand,Tester,Date,';
   for(let s=1;s<=3;s++)for(let t=1;t<=10;t++)csv+=`S${s}T${t},`;
-  csv+='Set1,Set2,Set3,FH_Mean,BH_Mean,FH_Pct,BH_Pct,PASAT_G,Level\n';
+  csv+='Set1,Set2,Set3,FH_Mean,BH_Mean,FH_Pct,BH_Pct,PASAT_G,Level,';
+  for(let s=1;s<=3;s++)for(let t=1;t<=10;t++)csv+=`Z_S${s}T${t}${s===3&&t===10?'':','}`;
+  csv+='\n';
   const sorted=[...entries].sort((a,b)=>b.finalScore-a.finalScore);
   sorted.forEach((e,i)=>{
     const oi=oInterp(e.finalScore);
     csv+=`${i+1},${e.code},${e.sex},${e.age},${e.exp},${e.hand},${e.tester},${e.date},`;
     e.scores.forEach(v=>csv+=`${v!==null?v:''},`);
     const fhP=(e.fhPct!=null)?e.fhPct:Math.round(e.fhMean/20*100), bhP=(e.bhPct!=null)?e.bhPct:Math.round(e.bhMean/20*100);
-    csv+=`${e.setTots[0]},${e.setTots[1]},${e.setTots[2]},${e.fhMean.toFixed(2)},${e.bhMean.toFixed(2)},${fhP},${bhP},${e.finalScore.toFixed(2)},${oi.label}\n`;
+    csv+=`${e.setTots[0]},${e.setTots[1]},${e.setTots[2]},${e.fhMean.toFixed(2)},${e.bhMean.toFixed(2)},${fhP},${bhP},${e.finalScore.toFixed(2)},${oi.label},`;
+    for(let k=0;k<30;k++)csv+=`${(e.zones&&e.zones[k])||''}${k<29?',':''}`;
+    csv+='\n';
   });
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='PASAT_G_results.csv';a.click();
 }
@@ -1233,7 +1428,7 @@ function renderAnalytics(){
 
   // 2. Validity: item-total tables (zones, sets, FH/BH)
   let val='';
-  val+=itemTotalTable('Zones as items (DCZ, DMZ, CMZ, KAZ, Out)', S.zones, ['DCZ (4)','DMZ (3)','CMZ (2)','KAZ (1)','Out (0)'], S.n);
+  val+=itemTotalTable('Score levels as items (4=DCZ · 3=DMZ/LMZ/RMZ · 2=CMZ/KAZ-L/R · 1=KAZ-M · 0=Out)', S.zones, ['DCZ (4)','Z3 · DMZ/LMZ/RMZ','Z2 · CMZ/KAZ-L/R','KAZ-M (1)','Out (0)'], S.n);
   val+=itemTotalTable('Sets as items (Set 1, 2, 3)', S.sets, ['Set 1','Set 2','Set 3'], S.n);
   val+=itemTotalTable('Subtests as items (Forehand, Backhand)', [S.fh,S.bh], ['Forehand','Backhand'], S.n);
   h+=_section('2 &middot; Validity Test &mdash; item-total correlation', val);
@@ -1283,7 +1478,7 @@ function exportStats(){
     L.push('Critical r (df='+(S.n-2)+'),'+(isNaN(crit)?'NA':crit.toFixed(3)));
     L.push('');
   }
-  valBlock('Zones',S.zones,['DCZ','DMZ','CMZ','KAZ','Out']);
+  valBlock('Score levels',S.zones,['DCZ(4)','Z3 DMZ/LMZ/RMZ','Z2 CMZ/KAZ-L-R','KAZ-M(1)','Out(0)']);
   valBlock('Sets',S.sets,['Set1','Set2','Set3']);
   valBlock('Subtests',[S.fh,S.bh],['Forehand','Backhand']);
   const rel=hoytReliability(S.sets,S.n);
@@ -1303,6 +1498,53 @@ function exportStats(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='PASAT_G_analytics.csv';a.click();
 }
 
+
+function isAdminUser(){
+  const me=currentUser?currentUser.email:'';
+  return !!(me&&ADMIN_EMAIL&&me.toLowerCase()===ADMIN_EMAIL.toLowerCase());
+}
+function renderAdminPanel(){
+  const el=document.getElementById('admin-panel');if(!el)return;
+  if(!isAdminUser()||!entries||entries.length===0){el.style.display='none';el.innerHTML='';return;}
+  el.style.display='block';
+  el.innerHTML=`<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border2);">
+    <div class="card-title" style="margin-bottom:6px;">Admin &nbsp;·&nbsp; Records by account</div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.5;">Visible only to the admin account. Delete all records saved by an unintended account below. To also remove that account's login: Firebase console &rarr; Build &rarr; Authentication &rarr; Users &rarr; &#8942; &rarr; Delete account.</p>
+    <div id="admin-user-rows"></div></div>`;
+  const wrap=el.querySelector('#admin-user-rows');
+  const by={};
+  entries.forEach(e=>{const k=e.createdBy||'(unknown)';(by[k]=by[k]||[]).push(e);});
+  Object.keys(by).sort((a,b)=>a.localeCompare(b)).forEach(k=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--border2);font-size:12px;';
+    const who=document.createElement('div');who.style.cssText='flex:1;color:var(--text2);word-break:break-all;';who.textContent=k;
+    const n=document.createElement('div');n.style.cssText='color:var(--text3);font-size:11px;white-space:nowrap;';n.textContent=by[k].length+' record'+(by[k].length===1?'':'s');
+    const btn=document.createElement('button');btn.className='btn-mini out';btn.type='button';btn.textContent='Delete records';
+    btn.addEventListener('click',()=>deleteByUser(k));
+    row.appendChild(who);row.appendChild(n);row.appendChild(btn);
+    wrap.appendChild(row);
+  });
+}
+function deleteByUser(email){
+  if(!isAdminUser()){alert('Only the admin account can delete records.');return;}
+  if(!confirm('Delete ALL records saved by '+email+'? This cannot be undone.'))return;
+  if(USE_FB&&auth&&auth.currentUser){
+    db.collection('participants').where('createdBy','==',email).get().then(snap=>{
+      let docs=snap.docs.slice();
+      if(docs.length===0){alert('No cloud records found for '+email+'.');return;}
+      const totalN=docs.length;
+      (function chunk(){
+        if(docs.length===0){alert('Deleted '+totalN+' record(s) saved by '+email+'.');return;}
+        const b=db.batch();
+        docs.splice(0,400).forEach(d=>b.delete(d.ref));
+        b.commit().then(chunk).catch(e=>alert('Error deleting: '+e.message));
+      })();
+    }).catch(e=>alert('Error reading records: '+e.message));
+  } else {
+    entries=entries.filter(e=>(e.createdBy||'(unknown)')!==email);
+    saveLocal();renderResults();
+  }
+}
 
 function resetAllData(){
   const email=currentUser?currentUser.email:'';
@@ -1338,7 +1580,7 @@ function resetAllData(){
   }
 }
 loadProState();
-buildTrials();updateSummary();drawCourt();
+buildTrials();updateSummary();drawCourt();initCourtInput();
 initBackend();
 document.getElementById('auth-pass').addEventListener('keydown',e=>{if(e.key==='Enter')authSubmit();});
 document.getElementById('auth-email').addEventListener('keydown',e=>{if(e.key==='Enter')authSubmit();});
